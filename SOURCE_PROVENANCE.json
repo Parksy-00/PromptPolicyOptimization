@@ -1,0 +1,10 @@
+{
+  "scoring_alignment_reference": {
+    "project": "PromptConsolidation",
+    "path": "src/consolidation/context_distillation/mopcd/analysis/teacher_prompt_distributions/score.py",
+    "function": "response_hidden",
+    "source_sha256": "62581d4626f17f50e505c6b990348de4622ded6b08f89bc0917a021eeb7c112a",
+    "last_committed_change": "48917a4955b2a0de6746b131cbc645384a1675b0",
+    "adaptation": "Serial base-model hidden-state extraction and chunked FP32 full-vocabulary target logprob; no padding or package imports from the source project."
+  }
+}

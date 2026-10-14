@@ -1,0 +1,46 @@
+initial_prompt = "Solve the problem carefully. Put your final answer on a line starting with ###."
+
+[benchmark]
+name = "toy_arithmetic_contract_example"
+scorer = "numeric"
+train = "../../examples/data/train.jsonl"
+validation = "../../examples/data/validation.jsonl"
+test = "../../examples/data/test.jsonl"
+
+[model]
+# Fill this with a local model directory, or a Hugging Face repo ID plus an immutable revision.
+name_or_path = ""
+revision = ""
+device = "cuda:0"
+dtype = "bfloat16"
+max_context_tokens = 32768
+head_chunk = 256
+
+[generation]
+temperature = 0.6
+top_p = 1.0
+max_new_tokens = 2048
+enable_thinking = true
+
+[reflection]
+temperature = 0.7
+top_p = 1.0
+max_new_tokens = 4096
+
+[search]
+minibatch_size = 2
+train_rollouts = 4
+validation_rollouts = 1
+test_rollouts = 3
+max_iterations = 20
+max_task_rollouts = 2000
+search_seed = 0
+
+[objective]
+mode = "success_likelihood"
+weight = 1.0
+max_accuracy_drop = 0.0
+tolerance = 0.00000001
+measure_likelihood = true
+likelihood_feedback = true
+score_failures = true
