@@ -28,4 +28,3 @@ reuse `TrajectoryScorer`, `Trajectory` and the objective without importing conso
 The serial numerical kernel was adapted from the reference listed in `SOURCE_PROVENANCE.json`.
 Unlike that Qwen-specific unmasked right-padding path, it does not batch/pad trajectories. Numerical
 tests compare it with full causal-LM logits on a tiny random Qwen3 model and chunk-size changes.
-

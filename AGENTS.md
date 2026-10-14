@@ -14,4 +14,3 @@
   run only after the user approves its explicit conditions and data/model identities.
 - Store each scientific execution under `artifacts/runs/<run-id>/`; do not commit research outputs,
   add schedulers/databases, delete remote data or upload results automatically.
-

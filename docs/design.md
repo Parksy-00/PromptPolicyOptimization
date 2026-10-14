@@ -28,4 +28,3 @@ delta test accuracy, success/failure gains and costs. Planned figures: validatio
 success gain versus observed compute. These should be generated after research runs; no results
 or figures are fabricated. Generalization of likelihood gains to a separate held-out trajectory
 bank and advantage-weighted failure suppression are future additions, not implemented claims.
-

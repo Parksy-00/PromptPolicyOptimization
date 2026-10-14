@@ -1,0 +1,2 @@
+# Preserve the byte-identical pinned upstream source, including its whitespace.
+vendor/** -whitespace

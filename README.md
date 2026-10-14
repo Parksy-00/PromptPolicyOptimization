@@ -120,4 +120,3 @@ The repository does not upload, delete or mirror scientific artifacts automatica
 
 See [code map](docs/codemap.md), [experimental design](docs/design.md) and
 [third-party provenance](THIRD_PARTY_NOTICES.md).
-

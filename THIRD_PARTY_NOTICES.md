@@ -13,4 +13,3 @@ PromptConsolidation's `teacher_prompt_distributions/score.py::response_hidden`.
 artifact from that project is imported. The existing GEPA-artifact copyright/license notice is
 preserved in `LICENSES/gepa-artifact-MIT.txt`. An overall license for the user's new research code
 has not been assigned automatically.
-

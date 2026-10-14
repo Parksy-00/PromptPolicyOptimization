@@ -22,4 +22,3 @@ research dataset runs, or pretrained Qwen3-8B experiments were used for these te
 The supplied experiment is a template using toy arithmetic data with an unspecified target
 model. Research efficacy, canonical DAPO/GPQA scoring and objective-weight calibration remain
 unmeasured. Configure and review real scientific conditions before launching an experiment.
-
