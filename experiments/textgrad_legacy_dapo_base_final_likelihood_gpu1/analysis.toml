@@ -1,0 +1,31 @@
+[design]
+question = "Does the earlier DAPO run with larger validation gains increase likelihood of its original successful base responses?"
+comparison = "Base candidate 0 versus validation-selected candidate 17; actual accepted path 0 -> 2 -> 7 -> 17."
+trajectory = "All 300 original base-validation responses, reconstructed preserved prefixes including reasoning; no EOS appended."
+primary = "Mean original binary reward times full-vocabulary T1 sequence logprob change, fixed base responses."
+secondary = "T0.6 full vocabulary, token means, successful-response increase counts, normal-stop/count-matched sensitivity."
+authorization = "User requested the earlier DAPO likelihood analysis, continuing the same pinned model and approved local physical GPU 1."
+
+[model]
+path = "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218"
+revision = "b968826d9c46dd6066d109eabc6255188de91218"
+max_context_tokens = 40960
+
+[statistics]
+bootstrap_seed = 1729
+bootstrap_repeats = 2000
+
+[execution]
+physical_gpu = 1
+cpu_threads = 4
+head_chunk = 256
+output = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261015-textgrad-legacy-dapo-base-final-likelihood-gpu1"
+
+[[sources]]
+name = "dapo_legacy"
+benchmark = "DAPOMathBench"
+task_format = "dspy_chat_adapter_v1"
+root = "/home/parksy1202/workspace/PromptConsolidation/artifacts/runs/20260917T062343Z-dapo-textgrad-ctx40-bbd2"
+final_candidate = "17"
+repeat_evaluation = "20260917T142136Z-textgrad-test-val8-2e46"
+scorer_reference = "/home/parksy1202/workspace/PromptConsolidation/src/common/evaluation/dapo_math.py"

@@ -133,3 +133,18 @@ After authorization, omit `--dry-run`. Outputs include endpoint metrics, per-res
 conditional question bootstrap intervals and independent verification of all token-score files.
 There is no generation or test-set evaluation. A failed execution is recorded and is not resumed
 or overwritten automatically.
+
+## Historical DSPy DAPO endpoint comparisons
+
+The same endpoint module also accepts explicitly declared `task_format=dspy_chat_adapter_v1`
+for historical DAPO runs. It checks the selected endpoint against the original summary and
+accepted parent chain; validates every recorded original accuracy and format score using the
+historical structured-field/Python-int parser; and scores fixed original base-validation
+responses under actual captured base and selected messages. Question/history and the exact
+DSPy instruction wrapper must agree. No DSPy imports or reconstructed wrapper template are
+needed. The consulted scorer source hash and input inventory are recorded with the execution.
+
+`experiments/textgrad_legacy_dapo_base_final_likelihood_gpu1/analysis.toml` declares the earlier
+seed0 run, candidate 17 and physical GPU 1. It scores 600 contexts for 300 fixed responses, with
+no native-format cache reuse. Each output also contains a reconstruction count audit. Existing
+native-format input preparation and the numerical scoring kernel remain unchanged.

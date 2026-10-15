@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import time
 import tomllib
@@ -16,6 +17,7 @@ from prompt_policy.analysis.textgrad_likelihood import (
     flat_ids,
     prepare,
     read_jsonl,
+    reconstruct,
     score_context,
     summarize_arrays,
     write_csv,
@@ -42,6 +44,11 @@ def cached_context(record, cache_root, prompt_ids, response_ids):
 
 
 def build_inputs(config, tokenizer):
+    formats = {s.get("task_format", "textgrad_native_v1") for s in config["sources"]}
+    if formats == {"dspy_chat_adapter_v1"}:
+        return build_legacy_inputs(config, tokenizer)
+    if formats != {"textgrad_native_v1"}:
+        raise ValueError("Use one explicitly supported task format per endpoint execution")
     original_plan, jobs, _, _ = prepare(config, tokenizer)
     selected, work = [], []
     for source in config["sources"]:
@@ -95,6 +102,202 @@ def build_inputs(config, tokenizer):
                 raise ValueError("Endpoint context overflow")
             work.append({**job, "contexts": {"0": job["contexts"]["0"], final_id: prefix}})
     return original_plan["sources"], selected, work
+
+
+def legacy_dapo_score(raw_text, gold_answer):
+    """Historical DSPy DAPO field extraction and Python-int score, checked against saved rows."""
+    sections = [(None, [])]
+    for line in (raw_text or "").splitlines():
+        match = re.match(r"\[\[ ## (\w+) ## \]\]", line.strip())
+        if match is None:
+            sections[-1][1].append(line)
+        else:
+            remaining = line[match.end() :].strip()
+            sections.append((match[1], [remaining] if remaining else []))
+    fields = {}
+    for name, lines in sections:
+        if name in ("reasoning", "answer") and name not in fields:
+            fields[name] = "\n".join(lines).strip()
+    if set(fields) != {"reasoning", "answer"}:
+        return 0.0, 0.0
+    try:
+        prediction = int(fields["answer"])
+    except (TypeError, ValueError):
+        return 0.0, 0.0
+    return float(prediction == int(gold_answer)), 1.0
+
+
+def instruction_wrapper(system, instruction):
+    """Identify the exact preserved DSPy wrapper around its indented instruction."""
+    tail = instruction.replace("\n", "\n        ")
+    if not tail or not system.endswith(tail):
+        raise ValueError("Captured system message does not contain the declared DSPy instruction")
+    return system[: -len(tail)]
+
+
+def build_legacy_inputs(config, tokenizer):
+    sources, endpoints, jobs = [], [], []
+    for source in config["sources"]:
+        if source["benchmark"] != "DAPOMathBench":
+            raise ValueError("Historical DSPy endpoint reader currently supports DAPO only")
+        root = Path(source["root"]).resolve()
+        native = root / "native"
+        evaluation = root / "evaluations" / source["repeat_evaluation"]
+        cfg = json.loads((native / "config.json").read_text())
+        summary = json.loads((native / "summary.json").read_text())
+        if summary["status"] != "complete":
+            raise ValueError("Historical source is incomplete")
+        prov = cfg["provenance"]
+        if prov.get("task_format", "dspy_chat_adapter_v1") != "dspy_chat_adapter_v1":
+            raise ValueError("Source is not the historical DSPy task format")
+        if prov["task_model"]["revision"] != config["model"]["revision"]:
+            raise ValueError("Historical source model revision mismatch")
+        if prov["scorer"] != "common.evaluation.dapo_math.score_dapo_math_completion":
+            raise ValueError("Unexpected historical scoring contract")
+        final_id = source["final_candidate"]
+        if summary["best_candidate_id"] != final_id:
+            raise ValueError("Endpoint differs from original validation selection")
+        candidates = {r["candidate_id"]: r for r in read_jsonl(native / "candidates.jsonl")}
+        base, final = candidates["0"], candidates[final_id]
+        if not base["is_base"] or not final["accepted"]:
+            raise ValueError("Invalid source endpoints")
+        path, current = [final_id], final
+        while current["parent_ids"]:
+            if len(current["parent_ids"]) != 1 or current["parent_ids"][0] in path:
+                raise ValueError("Invalid selected prompt lineage")
+            current = candidates[current["parent_ids"][0]]
+            path.append(current["candidate_id"])
+        if path[-1] != "0":
+            raise ValueError("Selected prompt does not descend from base")
+        splits = json.loads((native / "splits.json").read_text())
+        examples = {split: {e["sample_id"]: e for e in rows} for split, rows in splits.items()}
+        captures = {cid: {} for cid in candidates}
+        native_rows = read_jsonl(native / "responses.jsonl")
+        for row in native_rows:
+            if row["split"] not in {"train", "validation"}:
+                raise ValueError("Unexpected test responses in optimization source")
+            ex = examples[row["split"]][row["sample_id"]]
+            score, format_success = legacy_dapo_score(row.get("completion"), ex["answer"])
+            if score != row["score"] or format_success != row["format_success"]:
+                raise ValueError("Historical scorer does not reproduce a saved reward/format result")
+            if row["split"] == "validation":
+                if row["sample_id"] in captures[row["candidate_id"]]:
+                    raise ValueError("Duplicate original validation response")
+                captures[row["candidate_id"]][row["sample_id"]] = row
+        for cid, rows in captures.items():
+            if set(rows) != set(examples["validation"]):
+                raise ValueError("Incomplete historical validation capture")
+            if (
+                abs(np.mean([r["score"] for r in rows.values()]) - candidates[cid]["validation_score"])
+                > 1e-12
+            ):
+                raise ValueError("Historical validation accuracy mismatch")
+        em = json.loads((evaluation / "manifest.json").read_text())
+        if em["source_run_id"] != root.name or em["best_candidate_id"] != final_id:
+            raise ValueError("Historical repeat evaluation attribution mismatch")
+        for name, sha in em["source_sha256"].items():
+            if file_sha256(native / name) != sha:
+                raise ValueError("Historical evaluation input hash mismatch")
+        repeat = json.loads((evaluation / "validation_summary.json").read_text())
+        if repeat["status"] != "complete":
+            raise ValueError("Repeat evaluation incomplete")
+        repeated = {r["candidate_id"]: r for r in repeat["candidates"]}
+        inventory = {
+            str(p.relative_to(root)): file_sha256(p)
+            for p in [
+                *(
+                    native / name
+                    for name in [
+                        "config.json",
+                        "summary.json",
+                        "candidates.jsonl",
+                        "splits.json",
+                        "responses.jsonl",
+                    ]
+                ),
+                evaluation / "manifest.json",
+                evaluation / "validation_summary.json",
+            ]
+        }
+        sources.append(
+            {
+                "run_id": root.name,
+                "root": str(root),
+                "benchmark": source["benchmark"],
+                "task_format": "dspy_chat_adapter_v1",
+                "seed": cfg["seed"],
+                "files_sha256": inventory,
+                "reward_checks": len(native_rows),
+                "repeat_validation": repeat,
+                "scorer_reference_sha256": file_sha256(Path(source["scorer_reference"])),
+            }
+        )
+        endpoints.append(
+            {
+                "source": source["name"],
+                "run_id": root.name,
+                "base_id": "0",
+                "selected_id": final_id,
+                "task_format": "dspy_chat_adapter_v1",
+                "actual_accepted_path": path[::-1],
+                "base_validation": base["validation_score"],
+                "selected_validation": final["validation_score"],
+                "base_repeat8_validation": repeated["0"]["mean_success_rate"],
+                "selected_repeat8_validation": repeated[final_id]["mean_success_rate"],
+                "base_instruction": base["instruction"],
+                "selected_instruction": final["instruction"],
+            }
+        )
+        for sample_id, old in captures["0"].items():
+            new = captures[final_id][sample_id]
+            old_messages, new_messages = old["messages"], new["messages"]
+            if old_messages[1:] != new_messages[1:]:
+                raise ValueError("Endpoint requests differ in question/history")
+            if instruction_wrapper(old_messages[0]["content"], base["instruction"]) != instruction_wrapper(
+                new_messages[0]["content"], final["instruction"]
+            ):
+                raise ValueError("Endpoint DSPy wrappers differ")
+            contexts = {}
+            for cid, row in [("0", old), (final_id, new)]:
+                request = row["provider_call"]["request"]
+                if request["messages"] != row["messages"]:
+                    raise ValueError("Actual request differs from saved endpoint messages")
+                for key, expected in [
+                    ("temperature", 0.6),
+                    ("top_p", 0.95),
+                    ("top_k", 20),
+                    ("max_tokens", 16384),
+                ]:
+                    if request.get(key) != expected:
+                        raise ValueError("Historical request sampling settings differ")
+                prefix = flat_ids(
+                    tokenizer.apply_chat_template(
+                        row["messages"], tokenize=True, add_generation_prompt=True, enable_thinking=True
+                    )
+                )
+                if len(prefix) != row["usage"]["prompt_tokens"]:
+                    raise ValueError("Captured endpoint prompt token count differs")
+                contexts[cid] = prefix
+            ids, audit = reconstruct(old, tokenizer)
+            if any(
+                len(prefix) + len(ids) > config["model"]["max_context_tokens"] for prefix in contexts.values()
+            ):
+                raise ValueError("Historical endpoint context overflow")
+            jobs.append(
+                {
+                    "row_key": source["name"] + ":" + str(old["call_id"]),
+                    "source": source["name"],
+                    "sample_id": sample_id,
+                    "split": "validation",
+                    "response_ids": ids,
+                    "reward": old["score"],
+                    "finish_reason": old["finish_reason"],
+                    "audit": audit,
+                    "messages": old_messages,
+                    "contexts": contexts,
+                }
+            )
+    return sources, endpoints, jobs
 
 
 def summarize_endpoint(rows, repeats, rng):
@@ -172,7 +375,7 @@ def make_report(output, plan, jobs, cache, statistics):
         )
     lines += [
         "",
-        "Reward is the original binary native scorer result. G is mean r * (logp_selected - logp_base). "
+        "Reward is the original binary source scorer result. G is mean r * (logp_selected - logp_base). "
         "Failures contribute zero; the denominator includes all questions. T=0.6, token means and "
         "normal-stop/count-matched sensitivity appear in endpoint_summary.csv.",
         "",
@@ -203,13 +406,15 @@ def run(config_path, dry_run=False):
     model_path = Path(config["model"]["path"]).resolve()
     if model_path.name != config["model"]["revision"]:
         raise ValueError("Model snapshot revision mismatch")
-    cache_root = Path(config["cache"]["run"]).resolve()
-    old_manifest = json.loads((cache_root / "manifest.json").read_text())
-    if old_manifest["status"] != "complete" or old_manifest["config"]["model"] != config["model"]:
+    cache_root = Path(config["cache"]["run"]).resolve() if "cache" in config else None
+    old_manifest = json.loads((cache_root / "manifest.json").read_text()) if cache_root else None
+    if old_manifest and (
+        old_manifest["status"] != "complete" or old_manifest["config"]["model"] != config["model"]
+    ):
         raise ValueError("Cache model identity or completion status differs")
     tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
     sources, endpoints, jobs = build_inputs(config, tokenizer)
-    previous = {r["key"]: r for r in read_jsonl(cache_root / "score_index.jsonl")}
+    previous = {r["key"]: r for r in read_jsonl(cache_root / "score_index.jsonl")} if cache_root else {}
     work = [(j, cid, prefix) for j in jobs for cid, prefix in j["contexts"].items()]
     reused = sum(j["row_key"] + ":" + cid in previous for j, cid, _ in work)
     plan = {
@@ -221,7 +426,7 @@ def run(config_path, dry_run=False):
         "config_sha256": file_sha256(config_path),
         "source_sha256": file_sha256(Path(__file__)),
         "kernel_sha256": file_sha256(Path(__file__).with_name("textgrad_likelihood.py")),
-        "cache_manifest_sha256": file_sha256(cache_root / "manifest.json"),
+        "cache_manifest_sha256": file_sha256(cache_root / "manifest.json") if cache_root else None,
         "reference_trajectories": len(jobs),
         "scoring_contexts": len(work),
         "reused_contexts": reused,
@@ -237,14 +442,31 @@ def run(config_path, dry_run=False):
     (output / "tokens").mkdir()
     (output / "analysis.toml").write_bytes(config_path.read_bytes())
     write_json(output / "plan.json", plan)
+    write_csv(
+        output / "reconstruction_audit.csv",
+        [
+            {
+                "row_key": j["row_key"],
+                "source": j["source"],
+                "finish_reason": j["finish_reason"],
+                "reward": j["reward"],
+                **j["audit"],
+            }
+            for j in jobs
+        ],
+    )
     manifest = {"status": "running", "physical_gpu": 1, "torch": torch.__version__}
     write_json(output / "manifest.json", manifest)
     started, cache = time.perf_counter(), {}
     try:
-        for name, sha in old_manifest["model_files_sha256"].items():
-            if file_sha256(model_path / name) != sha:
-                raise ValueError("Model file changed since cached execution")
-        manifest["model_files_sha256"] = old_manifest["model_files_sha256"]
+        model_hashes = {
+            p.name: file_sha256(p)
+            for p in sorted(model_path.iterdir())
+            if p.is_file() and p.suffix in {".json", ".jinja", ".safetensors"}
+        }
+        if old_manifest and model_hashes != old_manifest["model_files_sha256"]:
+            raise ValueError("Model files changed since cached execution")
+        manifest["model_files_sha256"] = model_hashes
         model = None
         work.sort(
             key=lambda w: (

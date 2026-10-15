@@ -44,3 +44,8 @@ Base-to-final selected endpoint comparisons use `prompt_policy.analysis.textgrad
 They fix original base-validation responses, verify and copy exact cached contexts, and score
 missing endpoint contexts with the existing numerical kernel. Endpoint identity is checked
 against each native summary and the actual accepted parent chain.
+
+Historical DSPy DAPO endpoints use the same endpoint module with explicit
+`task_format=dspy_chat_adapter_v1`. `build_legacy_inputs` reads actual captured endpoint messages,
+checks identical wrapper/question history, and verifies all saved rewards via `legacy_dapo_score`.
+A cache is optional; the no-cache path hashes the pinned model files and scores all contexts.
