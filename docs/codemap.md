@@ -39,3 +39,8 @@ Completed audits are independently verified by `prompt_policy.analysis.textgrad_
 checks token caches, original/repeated validation attribution and input hashes before writing a
 cross-run report. See [TextGrad likelihood analysis](textgrad-likelihood.md) for the statistic,
 policy-gradient interpretation, sampling limitations and commands.
+
+Base-to-final selected endpoint comparisons use `prompt_policy.analysis.textgrad_endpoints`.
+They fix original base-validation responses, verify and copy exact cached contexts, and score
+missing endpoint contexts with the existing numerical kernel. Endpoint identity is checked
+against each native summary and the actual accepted parent chain.

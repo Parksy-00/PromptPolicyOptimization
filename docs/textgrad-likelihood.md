@@ -110,3 +110,26 @@ uv run --no-sync python -m prompt_policy.analysis.textgrad_report \
 The report includes accepted/rejected sign counts, the three accepted updates, descriptive
 within-benchmark correlations, validation request audits and verification evidence. It checks
 source hashes again and refuses incomplete runs or an existing report output directory.
+
+## Base versus final selected endpoints
+
+`prompt_policy.analysis.textgrad_endpoints` fixes original base-validation responses and compares
+their probability under the original base and final validation-selected prompt. Final identities
+must match native summaries and their accepted parent chains. This differs from comparing each
+proposal to its actual parent: likelihood changes on different response pools cannot be added.
+
+The standalone `experiments/textgrad_base_final_likelihood_gpu1/analysis.toml` declares DAPO
+0→6 (actual path 0→2→6) and GPQA 0→10, the same pinned model and physical GPU 1, and the completed
+update-audit run used as an exact token cache. Matching cache keys alone are insufficient: each
+cached prompt/response ID array, file hash and metric aggregation must also match. Verified cache
+files are copied into the new run with explicit reuse flags. Original artifacts remain read only.
+
+```bash
+CUDA_VISIBLE_DEVICES=1 uv run --no-sync python -m prompt_policy.analysis.textgrad_endpoints \
+  --config experiments/textgrad_base_final_likelihood_gpu1/analysis.toml --dry-run
+```
+
+After authorization, omit `--dry-run`. Outputs include endpoint metrics, per-response changes,
+conditional question bootstrap intervals and independent verification of all token-score files.
+There is no generation or test-set evaluation. A failed execution is recorded and is not resumed
+or overwritten automatically.

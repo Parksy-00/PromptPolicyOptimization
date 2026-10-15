@@ -1,0 +1,39 @@
+[design]
+question = "Do final validation-selected TextGrad prompts increase likelihood of fixed original base-validation responses?"
+comparison = "Base-to-final selected endpoints; base validation trajectories fixed. Original and repeat8 validation accuracy changes."
+trajectory = "Preserved base-validation responses, reasoning and final text reconstructed; no EOS appended."
+primary = "T1 full-vocabulary reward-weighted sequence logprob change, base to final on base validation only."
+secondary = "T0.6 full vocabulary, token means, successful-response increase counts, and normal-stop/count-matched sensitivity."
+authorization = "User requested base versus final optimized prompt change, continuing the approved GPU 1 likelihood analysis with the same model and archived sources."
+
+[model]
+path = "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218"
+revision = "b968826d9c46dd6066d109eabc6255188de91218"
+max_context_tokens = 40960
+
+[statistics]
+bootstrap_seed = 1729
+bootstrap_repeats = 2000
+
+[execution]
+physical_gpu = 1
+cpu_threads = 4
+head_chunk = 256
+output = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261015-textgrad-base-final-likelihood-gpu1"
+
+[[sources]]
+name = "dapo"
+final_candidate = "6"
+benchmark = "DAPOMathBench"
+root = "/home/parksy1202/workspace/PromptConsolidation/artifacts/runs/20260918T090003Z-dapo-textgrad-native-seed0-69d2"
+repeat_evaluation = "20260918T151719Z-textgrad-native-test-val8-91bb"
+
+[[sources]]
+name = "gpqa"
+final_candidate = "10"
+benchmark = "GPQABench"
+root = "/home/parksy1202/workspace/PromptConsolidation/artifacts/runs/20260918T090003Z-gpqa-textgrad-native-seed0-f3a6"
+repeat_evaluation = "20260918T151719Z-textgrad-native-test-val8-91bb"
+
+[cache]
+run = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261015-textgrad-update-likelihood-gpu1"
