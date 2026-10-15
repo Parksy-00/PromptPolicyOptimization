@@ -28,3 +28,14 @@ reuse `TrajectoryScorer`, `Trajectory` and the objective without importing conso
 The serial numerical kernel was adapted from the reference listed in `SOURCE_PROVENANCE.json`.
 Unlike that Qwen-specific unmasked right-padding path, it does not batch/pad trajectories. Numerical
 tests compare it with full causal-LM logits on a tiny random Qwen3 model and chunk-size changes.
+
+Archived TextGrad likelihood audits use `prompt_policy.analysis.textgrad_likelihood`.
+The standalone TOML declares source run IDs, the original validation selection and repeat8
+evaluation identities, exact model revision, reconstruction rules and GPU. The reader validates
+original rewards and parent/proposal/acceptance links, then reuses the same causal hidden-state
+alignment as the scorer. It performs no generation and never imports another project.
+
+Completed audits are independently verified by `prompt_policy.analysis.textgrad_report`, which
+checks token caches, original/repeated validation attribution and input hashes before writing a
+cross-run report. See [TextGrad likelihood analysis](textgrad-likelihood.md) for the statistic,
+policy-gradient interpretation, sampling limitations and commands.

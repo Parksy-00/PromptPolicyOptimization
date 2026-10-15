@@ -1,0 +1,34 @@
+[design]
+question = "Do original TextGrad proposals increase reward-weighted likelihood of their own train and optimization-validation trajectories?"
+comparison = "All accepted and rejected parent-to-proposal transitions; original validation revert decisions and separate repeat8 validation estimates."
+trajectory = "Preserved parent responses, reasoning and final text reconstructed; no EOS appended."
+primary = "T1 full-vocabulary reward-weighted sequence logprob change; train and full validation separately."
+secondary = "T0.6 full vocabulary, token means, success/failure changes, sequential filtered sampler support diagnostics."
+authorization = "User requested likelihood computation on local physical GPU 1 and inclusion of validation selection effects."
+
+[model]
+path = "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218"
+revision = "b968826d9c46dd6066d109eabc6255188de91218"
+max_context_tokens = 40960
+
+[statistics]
+bootstrap_seed = 1729
+bootstrap_repeats = 2000
+
+[execution]
+physical_gpu = 1
+cpu_threads = 4
+head_chunk = 256
+output = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261015-textgrad-update-likelihood-gpu1"
+
+[[sources]]
+name = "dapo"
+benchmark = "DAPOMathBench"
+root = "/home/parksy1202/workspace/PromptConsolidation/artifacts/runs/20260918T090003Z-dapo-textgrad-native-seed0-69d2"
+repeat_evaluation = "20260918T151719Z-textgrad-native-test-val8-91bb"
+
+[[sources]]
+name = "gpqa"
+benchmark = "GPQABench"
+root = "/home/parksy1202/workspace/PromptConsolidation/artifacts/runs/20260918T090003Z-gpqa-textgrad-native-seed0-f3a6"
+repeat_evaluation = "20260918T151719Z-textgrad-native-test-val8-91bb"

@@ -120,3 +120,11 @@ The repository does not upload, delete or mirror scientific artifacts automatica
 
 See [code map](docs/codemap.md), [experimental design](docs/design.md) and
 [third-party provenance](THIRD_PARTY_NOTICES.md).
+
+## Archived TextGrad analysis
+
+The independent [TextGrad likelihood audit](docs/textgrad-likelihood.md) scores fixed archived
+train and full optimization-validation responses under their actual parent and proposed prompts.
+It includes accepted and rejected proposals, original validation decisions, a separate repeat8
+validation comparison, per-token traces and independent verification. It performs no generation
+and does not change the GEPA search implementation described above.

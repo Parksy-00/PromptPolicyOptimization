@@ -12,6 +12,9 @@ dependencies = ["gepa==0.1.4"]
 [project.optional-dependencies]
 local = ["torch>=2.6,<3", "transformers>=4.51,<6", "huggingface-hub>=0.30"]
 dev = ["pytest>=8,<10", "ruff>=0.11"]
+analysis = [
+    "matplotlib>=3.9,<4",
+]
 
 [project.scripts]
 prompt-policy = "prompt_policy.cli:main"
