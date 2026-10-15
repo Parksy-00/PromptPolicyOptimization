@@ -49,6 +49,8 @@ def build_inputs(config, tokenizer):
         return build_legacy_inputs(config, tokenizer)
     if formats != {"textgrad_native_v1"}:
         raise ValueError("Use one explicitly supported task format per endpoint execution")
+    if any("response_origins" in source for source in config["sources"]):
+        raise ValueError("Candidate-origin input reader currently supports historical DSPy DAPO only")
     original_plan, jobs, _, _ = prepare(config, tokenizer)
     selected, work = [], []
     for source in config["sources"]:
@@ -232,71 +234,96 @@ def build_legacy_inputs(config, tokenizer):
                 "scorer_reference_sha256": file_sha256(Path(source["scorer_reference"])),
             }
         )
-        endpoints.append(
-            {
-                "source": source["name"],
-                "run_id": root.name,
-                "base_id": "0",
-                "selected_id": final_id,
-                "task_format": "dspy_chat_adapter_v1",
-                "actual_accepted_path": path[::-1],
-                "base_validation": base["validation_score"],
-                "selected_validation": final["validation_score"],
-                "base_repeat8_validation": repeated["0"]["mean_success_rate"],
-                "selected_repeat8_validation": repeated[final_id]["mean_success_rate"],
-                "base_instruction": base["instruction"],
-                "selected_instruction": final["instruction"],
-            }
-        )
-        for sample_id, old in captures["0"].items():
-            new = captures[final_id][sample_id]
-            old_messages, new_messages = old["messages"], new["messages"]
-            if old_messages[1:] != new_messages[1:]:
-                raise ValueError("Endpoint requests differ in question/history")
-            if instruction_wrapper(old_messages[0]["content"], base["instruction"]) != instruction_wrapper(
-                new_messages[0]["content"], final["instruction"]
-            ):
-                raise ValueError("Endpoint DSPy wrappers differ")
-            contexts = {}
-            for cid, row in [("0", old), (final_id, new)]:
-                request = row["provider_call"]["request"]
-                if request["messages"] != row["messages"]:
-                    raise ValueError("Actual request differs from saved endpoint messages")
-                for key, expected in [
-                    ("temperature", 0.6),
-                    ("top_p", 0.95),
-                    ("top_k", 20),
-                    ("max_tokens", 16384),
-                ]:
-                    if request.get(key) != expected:
-                        raise ValueError("Historical request sampling settings differ")
-                prefix = flat_ids(
-                    tokenizer.apply_chat_template(
-                        row["messages"], tokenize=True, add_generation_prompt=True, enable_thinking=True
-                    )
-                )
-                if len(prefix) != row["usage"]["prompt_tokens"]:
-                    raise ValueError("Captured endpoint prompt token count differs")
-                contexts[cid] = prefix
-            ids, audit = reconstruct(old, tokenizer)
-            if any(
-                len(prefix) + len(ids) > config["model"]["max_context_tokens"] for prefix in contexts.values()
-            ):
-                raise ValueError("Historical endpoint context overflow")
-            jobs.append(
-                {
-                    "row_key": source["name"] + ":" + str(old["call_id"]),
-                    "source": source["name"],
-                    "sample_id": sample_id,
-                    "split": "validation",
-                    "response_ids": ids,
-                    "reward": old["score"],
-                    "finish_reason": old["finish_reason"],
-                    "audit": audit,
-                    "messages": old_messages,
-                    "contexts": contexts,
+        endpoint = {
+            "source": source["name"],
+            "run_id": root.name,
+            "base_id": "0",
+            "selected_id": final_id,
+            "task_format": "dspy_chat_adapter_v1",
+            "actual_accepted_path": path[::-1],
+            "base_validation": base["validation_score"],
+            "selected_validation": final["validation_score"],
+            "base_repeat8_validation": repeated["0"]["mean_success_rate"],
+            "selected_repeat8_validation": repeated[final_id]["mean_success_rate"],
+            "base_instruction": base["instruction"],
+            "selected_instruction": final["instruction"],
+        }
+        origins = source.get("response_origins", ["0"])
+        if not origins or len(set(origins)) != len(origins) or any(cid not in candidates for cid in origins):
+            raise ValueError("Response origins must be distinct captured candidates")
+        if "response_origins" in source:
+            endpoint["response_origins"] = origins
+            endpoint["origin_candidates"] = {
+                cid: {
+                    "accepted": candidates[cid]["accepted"],
+                    "on_selected_path": cid in path,
+                    "validation_accuracy": candidates[cid]["validation_score"],
+                    "parent_ids": candidates[cid]["parent_ids"],
                 }
-            )
+                for cid in origins
+            }
+        endpoints.append(endpoint)
+        for origin_id in origins:
+            for sample_id, old in captures[origin_id].items():
+                new = captures[final_id][sample_id]
+                old_messages, new_messages = old["messages"], new["messages"]
+                if old_messages[1:] != new_messages[1:]:
+                    raise ValueError("Endpoint requests differ in question/history")
+                if instruction_wrapper(
+                    old_messages[0]["content"], candidates[origin_id]["instruction"]
+                ) != instruction_wrapper(new_messages[0]["content"], final["instruction"]):
+                    raise ValueError("Endpoint DSPy wrappers differ")
+                contexts = {}
+                context_rows = {"0": captures["0"][sample_id], final_id: new}
+                if source.get("include_origin_context", False):
+                    context_rows[origin_id] = old
+                for cid, row in context_rows.items():
+                    request = row["provider_call"]["request"]
+                    if request["messages"] != row["messages"]:
+                        raise ValueError("Actual request differs from saved endpoint messages")
+                    if row["messages"][1:] != old_messages[1:] or instruction_wrapper(
+                        row["messages"][0]["content"], candidates[cid]["instruction"]
+                    ) != instruction_wrapper(
+                        old_messages[0]["content"], candidates[origin_id]["instruction"]
+                    ):
+                        raise ValueError("Scoring context changes question/history or wrapper")
+                    for key, expected in [
+                        ("temperature", 0.6),
+                        ("top_p", 0.95),
+                        ("top_k", 20),
+                        ("max_tokens", 16384),
+                    ]:
+                        if request.get(key) != expected:
+                            raise ValueError("Historical request sampling settings differ")
+                    prefix = flat_ids(
+                        tokenizer.apply_chat_template(
+                            row["messages"], tokenize=True, add_generation_prompt=True, enable_thinking=True
+                        )
+                    )
+                    if len(prefix) != row["usage"]["prompt_tokens"]:
+                        raise ValueError("Captured endpoint prompt token count differs")
+                    contexts[cid] = prefix
+                ids, audit = reconstruct(old, tokenizer)
+                if any(
+                    len(prefix) + len(ids) > config["model"]["max_context_tokens"]
+                    for prefix in contexts.values()
+                ):
+                    raise ValueError("Historical endpoint context overflow")
+                jobs.append(
+                    {
+                        "row_key": source["name"] + ":" + str(old["call_id"]),
+                        "source": source["name"],
+                        "origin_id": origin_id,
+                        "sample_id": sample_id,
+                        "split": "validation",
+                        "response_ids": ids,
+                        "reward": old["score"],
+                        "finish_reason": old["finish_reason"],
+                        "audit": audit,
+                        "messages": old_messages,
+                        "contexts": contexts,
+                    }
+                )
     return sources, endpoints, jobs
 
 
@@ -322,7 +349,188 @@ def summarize_endpoint(rows, repeats, rng):
     return result
 
 
+def origin_contrast_row(job, reference_id, selected_id, cache):
+    old = cache[job["row_key"] + ":" + reference_id]
+    new = cache[job["row_key"] + ":" + selected_id]
+    row = {
+        "source": job["source"],
+        "row_key": job["row_key"],
+        "sample_id": job["sample_id"],
+        "origin_id": job["origin_id"],
+        "reference_id": reference_id,
+        "selected_id": selected_id,
+        "reward": job["reward"],
+        "finish_reason": job["finish_reason"],
+        "count_match": job["audit"]["expected_count_match"],
+    }
+    for metric in ["t1", "t06"]:
+        for kind in ["sum", "mean"]:
+            row[f"reference_{metric}_{kind}"] = old[metric][kind]
+            row[f"selected_{metric}_{kind}"] = new[metric][kind]
+            row[f"delta_{metric}_{kind}"] = new[metric][kind] - old[metric][kind]
+    return row
+
+
+def make_origin_report(output, plan, jobs, cache, statistics):
+    trajectories, summaries = [], []
+    rng = np.random.default_rng(statistics["bootstrap_seed"])
+    for endpoint in plan["endpoints"]:
+        final_id = endpoint["selected_id"]
+        for origin_id in endpoint["response_origins"]:
+            selected_jobs = [
+                j for j in jobs if j["source"] == endpoint["source"] and j["origin_id"] == origin_id
+            ]
+            origin = endpoint["origin_candidates"][origin_id]
+            status = (
+                "base"
+                if origin_id == "0"
+                else "final"
+                if origin_id == final_id
+                else ("accepted_intermediate" if origin["on_selected_path"] else "rejected")
+            )
+            previous_stats = {}
+            contrasts = [("base_to_final", "0")]
+            if origin_id in selected_jobs[0]["contexts"]:
+                contrasts.append(("origin_to_final", origin_id))
+            for contrast, reference_id in contrasts:
+                rows = [origin_contrast_row(j, reference_id, final_id, cache) for j in selected_jobs]
+                trajectories.extend({"contrast": contrast, **r} for r in rows)
+                if reference_id not in previous_stats:
+                    stats = summarize_endpoint(rows, statistics["bootstrap_repeats"], rng)
+                    for metric in ["t1", "t06"]:
+                        for kind in ["sum", "mean"]:
+                            for label, reward in [("success", 1), ("failure", 0)]:
+                                values = [r[f"delta_{metric}_{kind}"] for r in rows if r["reward"] == reward]
+                                stats[f"{label}_{metric}_{kind}"] = float(np.mean(values)) if values else None
+                    stats["successful_token_mean_increases"] = sum(
+                        r["reward"] == 1 and r["delta_t1_mean"] > 0 for r in rows
+                    )
+                    previous_stats[reference_id] = stats
+                summaries.append(
+                    {
+                        "source": endpoint["source"],
+                        "origin_id": origin_id,
+                        "origin_status": status,
+                        "origin_accepted": origin["accepted"],
+                        "on_selected_path": origin["on_selected_path"],
+                        "origin_validation_accuracy": origin["validation_accuracy"],
+                        "selected_validation_accuracy": endpoint["selected_validation"],
+                        "contrast": contrast,
+                        "reference_id": reference_id,
+                        "selected_id": final_id,
+                        **previous_stats[reference_id],
+                    }
+                )
+    write_csv(output / "trajectory_changes.csv", trajectories)
+    write_csv(output / "origin_summary.csv", summaries)
+    write_json(output / "summary.json", {"origin_contrasts": summaries})
+    lines = [
+        "# TextGrad candidate-origin likelihood comparisons",
+        "",
+        "Every origin contributes the same original validation questions with its own saved responses. "
+        "Each fixed response is scored under base, final and (when requested) its own generating prompt. "
+        "No new responses were generated. Rejected branches are descriptive comparisons, not actual accepted updates.",
+        "",
+        "G = mean original reward × (logp_final − logp_reference), T=1, nats/question. "
+        "Failures contribute zero and all questions stay in the denominator.",
+        "",
+        "| Origin | Status | Successes / questions | G: final − base | G: final − origin | "
+        "Success increases: final − base | Success increases: final − origin |",
+        "|---|---|---:|---:|---:|---:|---:|",
+    ]
+    for endpoint in plan["endpoints"]:
+        for origin_id in endpoint["response_origins"]:
+            base = next(
+                r
+                for r in summaries
+                if r["source"] == endpoint["source"]
+                and r["origin_id"] == origin_id
+                and r["contrast"] == "base_to_final"
+            )
+            own = next(
+                (
+                    r
+                    for r in summaries
+                    if r["source"] == endpoint["source"]
+                    and r["origin_id"] == origin_id
+                    and r["contrast"] == "origin_to_final"
+                ),
+                None,
+            )
+            own_g = f"{own['reward_weighted_t1_sum']:+.4f}" if own else "not measured"
+            own_increases = str(own["successful_sequence_increases"]) if own else "not measured"
+            lines.append(
+                f"| {origin_id} | {base['origin_status']} | {base['successful_questions']}/{base['questions']} | "
+                f"{base['reward_weighted_t1_sum']:+.4f} | {own_g} | "
+                f"{base['successful_sequence_increases']} | {own_increases} |"
+            )
+    lines += [
+        "",
+        "Final − base matches the GEPA endpoint contrast within each response origin. "
+        "Final − origin measures preservation of each candidate's own responses. It is zero for the final "
+        "origin by construction. A positive first contrast need not imply a positive second contrast.",
+        "",
+        "Each origin/contrast is reported separately; origins share questions and are not independent "
+        "optimizer runs. Conditional question bootstrap intervals (2000 resamples, statistical seed 1729) "
+        "do not include regeneration or across-run uncertainty. The duplicate base-origin contrasts "
+        "reuse the same bootstrap result. Original validation selected the final prompt, so this is "
+        "not held-out generalization evidence.",
+        "",
+        "Reward and format results reproduce the historical DSPy structured-field/Python-int scorer. "
+        "Recorded request messages preserve wrapper and question/history. Original response IDs and "
+        "EOS were not archived; response prefixes are reconstructed without adding EOS. Full-vocabulary "
+        "T=1 and T=0.6 scores are not certified historical truncated-sampler probabilities. "
+        "Normal-stop/count-matched sensitivity and success/failure conditional means are in origin_summary.csv.",
+        "",
+        "![Origin contrasts](origin_contrasts.png)",
+        "",
+        "[Origin metrics](origin_summary.csv) · [Per-response changes](trajectory_changes.csv) · "
+        "[Reconstruction audit](reconstruction_audit.csv) · [Verification](verification.json)",
+        "",
+    ]
+    (output / "README.md").write_text("\n".join(lines))
+    plot_origin_report(output, summaries)
+    return summaries
+
+
+def plot_origin_report(output, summaries):
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), constrained_layout=True)
+    for ax, contrast in zip(axes, ["base_to_final", "origin_to_final"], strict=True):
+        rows = [r for r in summaries if r["contrast"] == contrast]
+        for i, row in enumerate(rows):
+            value = row["reward_weighted_t1_sum"]
+            ax.errorbar(
+                i,
+                value,
+                yerr=[
+                    [max(0, value - row["conditional_ci_low"])],
+                    [max(0, row["conditional_ci_high"] - value)],
+                ],
+                fmt="o",
+                capsize=4,
+                color="#8c8c8c" if row["origin_status"] == "rejected" else "#386ca7",
+            )
+        ax.axhline(0, color="black", linewidth=0.8)
+        ax.set_xticks(
+            range(len(rows)),
+            [r["origin_id"] + ("*" if r["origin_status"] == "rejected" else "") for r in rows],
+        )
+        ax.set_xlabel("Generating candidate (* rejected)")
+        ax.set_ylabel("Reward-weighted sequence logprob change (nats/question)")
+        ax.set_title("Final − base" if contrast == "base_to_final" else "Final − generating candidate")
+    fig.savefig(output / "origin_contrasts.png", dpi=180)
+    fig.savefig(output / "origin_contrasts.pdf")
+    plt.close(fig)
+
+
 def make_report(output, plan, jobs, cache, statistics):
+    if any("response_origins" in endpoint for endpoint in plan["endpoints"]):
+        return make_origin_report(output, plan, jobs, cache, statistics)
     rows, endpoints = [], []
     rng = np.random.default_rng(statistics["bootstrap_seed"])
     for endpoint in plan["endpoints"]:
@@ -408,17 +616,26 @@ def run(config_path, dry_run=False):
         raise ValueError("Model snapshot revision mismatch")
     cache_root = Path(config["cache"]["run"]).resolve() if "cache" in config else None
     old_manifest = json.loads((cache_root / "manifest.json").read_text()) if cache_root else None
-    if old_manifest and (
-        old_manifest["status"] != "complete" or old_manifest["config"]["model"] != config["model"]
-    ):
+    cached_model = None
+    if old_manifest:
+        cache_plan = json.loads((cache_root / "plan.json").read_text())
+        cached_kernel = cache_plan.get("kernel_sha256", cache_plan.get("analysis_source_sha256"))
+        if cached_kernel != file_sha256(Path(__file__).with_name("textgrad_likelihood.py")):
+            raise ValueError("Cached numerical kernel differs")
+        cached_model = old_manifest.get("config", {}).get("model", cache_plan["model"])
+    if old_manifest and (old_manifest["status"] != "complete" or cached_model != config["model"]):
         raise ValueError("Cache model identity or completion status differs")
     tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
     sources, endpoints, jobs = build_inputs(config, tokenizer)
     previous = {r["key"]: r for r in read_jsonl(cache_root / "score_index.jsonl")} if cache_root else {}
     work = [(j, cid, prefix) for j in jobs for cid, prefix in j["contexts"].items()]
+    if len({j["row_key"] + ":" + cid for j, cid, _ in work}) != len(work):
+        raise ValueError("Duplicate captured scoring context identity")
     reused = sum(j["row_key"] + ":" + cid in previous for j, cid, _ in work)
     plan = {
-        "comparison_type": "base_to_validation_selected_endpoint",
+        "comparison_type": "candidate_origins"
+        if any("response_origins" in e for e in endpoints)
+        else "base_to_validation_selected_endpoint",
         "sources": sources,
         "endpoints": endpoints,
         "model": config["model"],
@@ -431,6 +648,7 @@ def run(config_path, dry_run=False):
         "scoring_contexts": len(work),
         "reused_contexts": reused,
         "new_contexts": len(work) - reused,
+        "input_tokens": sum(len(prefix) + len(j["response_ids"]) for j, _, prefix in work),
     }
     print(
         json.dumps({k: v for k, v in plan.items() if k not in {"sources", "endpoints"}}, indent=2), flush=True
@@ -450,6 +668,7 @@ def run(config_path, dry_run=False):
                 "source": j["source"],
                 "finish_reason": j["finish_reason"],
                 "reward": j["reward"],
+                "origin_id": j.get("origin_id", "0"),
                 **j["audit"],
             }
             for j in jobs
@@ -515,13 +734,20 @@ def run(config_path, dry_run=False):
                 stream.write(json.dumps(record, allow_nan=False) + "\n")
             cache[key] = metrics
             if i % 20 == 0 or i == len(work):
-                print(f"PROGRESS {i}/{len(work)} elapsed={time.perf_counter() - started:.1f}s", flush=True)
+                elapsed = time.perf_counter() - started
+                write_json(
+                    output / "progress.json", {"done": i, "total": len(work), "elapsed_seconds": elapsed}
+                )
+                print(f"PROGRESS {i}/{len(work)} elapsed={elapsed:.1f}s", flush=True)
         result = make_report(output, plan, jobs, cache, config["statistics"])
         proof = verify_tokens(output)
         if proof["verified_files"] != len(work) or proof["fixed_reference_trajectories"] != len(jobs):
             raise ValueError("Incomplete endpoint verification")
         write_json(output / "verification.json", proof)
-        manifest.update(status="complete", endpoints=result, verification=proof)
+        manifest.update(status="complete", verification=proof)
+        manifest["origin_contrasts" if plan["comparison_type"] == "candidate_origins" else "endpoints"] = (
+            result
+        )
     except BaseException as error:
         manifest.update(status="failed", error=f"{type(error).__name__}: {error}")
         raise

@@ -148,3 +148,19 @@ needed. The consulted scorer source hash and input inventory are recorded with t
 seed0 run, candidate 17 and physical GPU 1. It scores 600 contexts for 300 fixed responses, with
 no native-format cache reuse. Each output also contains a reconstruction count audit. Existing
 native-format input preparation and the numerical scoring kernel remain unchanged.
+
+## Intermediate candidate response origins
+
+The same historical endpoint stage accepts explicit `response_origins` and
+`include_origin_context`. Each origin contributes its own saved validation responses on the
+same questions. Final-minus-base reproduces the GEPA endpoint contrast within each origin;
+final-minus-generating-candidate measures preservation relative to each origin's own policy.
+Rejected branches remain labeled and final-origin self-comparisons are exactly zero.
+
+The standalone `experiments/textgrad_legacy_dapo_candidate_origins_gpu1/analysis.toml` declares
+origins0/2/7/9/15/17, 1800 fixed responses and4800 scoring contexts.600 exact cached base-origin
+contexts are reused after model/kernel identity, prompt/response IDs and checksum verification.
+No pooling across origins or new generations occurs. Conditional question-bootstrap intervals,
+success/failure conditional changes, per-response signs, length/temperature sensitivity and
+PNG/PDF figures are written alongside independently verified token-score files. Per-origin
+questions overlap, so origin rows are not independent optimizer runs.

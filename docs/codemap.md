@@ -49,3 +49,8 @@ Historical DSPy DAPO endpoints use the same endpoint module with explicit
 `task_format=dspy_chat_adapter_v1`. `build_legacy_inputs` reads actual captured endpoint messages,
 checks identical wrapper/question history, and verifies all saved rewards via `legacy_dapo_score`.
 A cache is optional; the no-cache path hashes the pinned model files and scores all contexts.
+
+Historical candidate-origin comparisons extend the same endpoint reader through explicit
+`response_origins` and `include_origin_context`. `make_origin_report` separates final-minus-base
+from final-minus-origin, preserves accepted/rejected branch identity, and reports each origin
+without pooling. Exact cached endpoint score files can be reused after ID/hash checks.
