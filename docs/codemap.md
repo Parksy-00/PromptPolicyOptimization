@@ -54,3 +54,11 @@ Historical candidate-origin comparisons extend the same endpoint reader through 
 `response_origins` and `include_origin_context`. `make_origin_report` separates final-minus-base
 from final-minus-origin, preserves accepted/rejected branch identity, and reports each origin
 without pooling. Exact cached endpoint score files can be reused after ID/hash checks.
+
+Online TextGrad prompt search extends the existing CLI using a `[textgrad]` configuration section.
+`textgrad_optimizer.py` supplies only local forward capture, numerical string losses, an EngineLM
+adapter, and admission/selection; upstream `LLMCall.backward`, `StringBasedFunction`, `sum` and
+`TextualGradientDescent` are unchanged and verified against `vendor/textgrad/UPSTREAM.json`.
+`objective.py::fixed_success_gain` retains failed rollouts in the per-question denominator and
+`textgrad_eligibility` enforces positive sequence gain plus a validation-accuracy guard. The benchmark
+module owns optional historical DSPy rendering/scoring; reflection requests always use plain messages.

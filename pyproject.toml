@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "prompt-policy-optimization"
 version = "0.1.0"
-description = "GEPA prompt search with verified fixed-trajectory likelihood improvements"
+description = "TextGrad and GEPA search with verified fixed-trajectory likelihood improvements"
 requires-python = ">=3.11"
 dependencies = ["gepa==0.1.4"]
 
@@ -15,12 +15,16 @@ dev = ["pytest>=8,<10", "ruff>=0.11"]
 analysis = [
     "matplotlib>=3.9,<4",
 ]
+textgrad = [
+    "textgrad",
+]
 
 [project.scripts]
 prompt-policy = "prompt_policy.cli:main"
 
 [tool.uv.sources]
 gepa = { path = "vendor/gepa", editable = true }
+textgrad = { git = "https://github.com/zou-group/textgrad.git", rev = "75e912e210864b61999781778cdf756d4468120f" }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/prompt_policy"]

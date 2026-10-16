@@ -4,6 +4,7 @@ import math
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 
+from prompt_policy.artifacts import digest
 from prompt_policy.types import Trajectory
 
 
@@ -81,3 +82,49 @@ def decide(
         accepted,
         reason,
     )
+
+
+def fixed_success_gain(parent, candidate, references, scorer):
+    """Reward-weighted sequence gain; failed rollouts stay in each question denominator."""
+    if not references or any(t.prompt != parent or t.split != "train" for t in references):
+        raise ValueError("Nonempty fixed parent train captures are required")
+    grouped, successes = defaultdict(list), []
+    for trajectory in references:
+        if trajectory.reward not in {0, 1}:
+            raise ValueError("Binary rewards required")
+        if trajectory.reward == 1:
+            old, new = scorer.score(parent, trajectory), scorer.score(candidate, trajectory)
+            pair = (new.total - old.total, new.mean - old.mean)
+            successes.append((trajectory, *pair))
+        else:
+            pair = (0.0, 0.0)
+        grouped[trajectory.example_id].append(pair)
+    if any(not math.isfinite(v) for values in grouped.values() for pair in values for v in pair):
+        raise ValueError("Non-finite fixed-trajectory gain")
+    return {
+        "sequence_gain": math.fsum(
+            math.fsum(v[0] for v in values) / len(values) for values in grouped.values()
+        )
+        / len(grouped),
+        "token_mean_gain": math.fsum(
+            math.fsum(v[1] for v in values) / len(values) for values in grouped.values()
+        )
+        / len(grouped),
+        "successes": len(successes),
+        "questions": len(grouped),
+        "success_increases": sum(v > 0 for _, v, _ in successes),
+        "pool_sha256": digest([t.to_dict() for t in references if t.reward == 1]),
+    }
+
+
+def textgrad_eligibility(parent, candidate, parent_accuracy, candidate_accuracy, gain, settings):
+    if candidate == parent or not candidate.strip():
+        return False, "identical or empty prompt"
+    if candidate_accuracy < parent_accuracy - settings["max_accuracy_drop"] - settings["tolerance"]:
+        return False, "validation accuracy guard"
+    if settings["mode"] == "success_likelihood_ascent":
+        if gain["successes"] == 0:
+            return False, "no parent successes; likelihood ascent is unverified"
+        if gain["sequence_gain"] <= settings["tolerance"]:
+            return False, "fixed-parent success likelihood did not increase"
+    return True, "eligible"

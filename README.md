@@ -128,3 +128,11 @@ train and full optimization-validation responses under their actual parent and p
 It includes accepted and rejected proposals, original validation decisions, a separate repeat8
 validation comparison, per-token traces and independent verification. It performs no generation
 and does not change the GEPA search implementation described above.
+
+## Online TextGrad
+
+The existing CLI also supports official TextGrad with numerical fixed-parent success-likelihood
+feedback and a verified positive-gain admission filter. See the [method](docs/textgrad-online.md)
+and the [DAPO pilot plan](experiments/textgrad_dapo_likelihood_pilot/plan_report.md).
+Install the `textgrad` extra alongside the local/dev extras. This is a separate optimizer path;
+the GEPA objective and native state machinery described above retain their existing behavior.

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import os
 import statistics
 import subprocess
 import sys
@@ -36,7 +37,7 @@ def source_identity(root: Path) -> dict:
         ).strip()
     except subprocess.CalledProcessError:
         revision = None
-    paths = sorted((root / "src").rglob("*.py")) + [root / "pyproject.toml"]
+    paths = sorted((root / "src").rglob("*.py")) + [root / "pyproject.toml", root / "uv.lock"]
     return {"git_commit": revision, "files_sha256": {str(p.relative_to(root)): file_sha256(p) for p in paths}}
 
 
@@ -85,18 +86,36 @@ def run(config_path: Path, *, dry_run=False, output: Path | None = None):
     root = Path(__file__).resolve().parents[2]
     config, benchmark = load_config(config_path)
     config, missing = resolve_model(config, config_path.parent)
-    upstream = verify_gepa(root)
+    if "textgrad" in config:
+        from prompt_policy.textgrad_optimizer import verify_textgrad
+
+        upstream = verify_textgrad()
+        optimizer_name = "textgrad"
+    else:
+        upstream = verify_gepa(root)
+        optimizer_name = "gepa"
     plan = {
         "executable": not missing,
         "missing": missing,
         "config": config,
         "benchmark": benchmark.identity,
-        "gepa": upstream,
-        "objective": "delta_accuracy + weight * question_balanced_mean_delta_logprob_T1",
+        optimizer_name: upstream,
+        "optimizer": optimizer_name,
+        "objective": (
+            "maximize fixed-parent reward-weighted sequence logprob gain, require G>tolerance; validation guard"
+            if config["objective"]["mode"] == "success_likelihood_ascent"
+            else "validation accuracy"
+            if optimizer_name == "textgrad"
+            else "delta_accuracy + weight * question_balanced_mean_delta_logprob_T1"
+        ),
         "final_selection": "validation_accuracy_only",
         "notes": [
-            "No sampling seeds are sent; search_seed controls GEPA search only.",
-            "Budget checked between complete iterations; the last iteration can exceed it.",
+            "No sampling seeds are sent; search_seed controls search minibatches only.",
+            (
+                "TextGrad reserves each complete iteration before work; a missing-success batch can use less."
+                if optimizer_name == "textgrad"
+                else "Budget checked between complete iterations; the last iteration can exceed it."
+            ),
             "Built-in JSONL scorers do not claim canonical DAPO/GPQA equivalence.",
         ],
     }
@@ -117,9 +136,11 @@ def run(config_path: Path, *, dry_run=False, output: Path | None = None):
         "config_sha256": digest(config),
         "benchmark": benchmark.identity,
         "source": source_identity(root),
-        "gepa": upstream,
+        optimizer_name: upstream,
+        "optimizer": optimizer_name,
         "environment": {
             "python": sys.version,
+            "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
             "packages": {d.metadata["Name"]: d.version for d in importlib.metadata.distributions()},
         },
         "limits": plan["notes"],
@@ -128,7 +149,11 @@ def run(config_path: Path, *, dry_run=False, output: Path | None = None):
     recorder.write("manifest.json", manifest)
     try:
         from prompt_policy.backends import LocalHFBackend
-        from prompt_policy.optimizer import search
+
+        if optimizer_name == "textgrad":
+            from prompt_policy.textgrad_optimizer import search
+        else:
+            from prompt_policy.optimizer import search
 
         backend = LocalHFBackend(config, recorder)
         manifest["model"] = backend.identity
@@ -159,7 +184,11 @@ def run(config_path: Path, *, dry_run=False, output: Path | None = None):
                 "test": tests,
                 "search_cost": search_cost,
                 "total_cost": dict(recorder.cost),
-                "gepa_total_metric_calls": result.total_metric_calls,
+                (
+                    "textgrad_total_metric_calls"
+                    if optimizer_name == "textgrad"
+                    else "gepa_total_metric_calls"
+                ): result.total_metric_calls,
                 "budget_counter": "search_cost.task_calls (actual individual task rollouts)",
             },
         )
@@ -177,7 +206,7 @@ def run(config_path: Path, *, dry_run=False, output: Path | None = None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Independent GEPA prompt policy optimization")
+    parser = argparse.ArgumentParser(description="Independent prompt policy optimization")
     parser.add_argument("config", type=Path, help="Standalone experiment TOML")
     parser.add_argument(
         "--dry-run", action="store_true", help="Validate and report; no model load or generation"

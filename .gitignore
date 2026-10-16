@@ -10,3 +10,6 @@ build/
 artifacts/runs/
 artifacts/reports/
 .env
+
+artifacts/inputs/
+logs/

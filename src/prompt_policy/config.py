@@ -35,12 +35,15 @@ SCHEMA = {
 
 
 def validate_config(config: dict):
-    if set(config) != {*SCHEMA, "initial_prompt"}:
+    if set(config) - {"textgrad"} != {*SCHEMA, "initial_prompt"}:
         raise ValueError("Config requires initial_prompt and exactly: " + ", ".join(SCHEMA))
     if not isinstance(config["initial_prompt"], str) or not config["initial_prompt"].strip():
         raise ValueError("initial_prompt must be nonempty")
     for section, keys in SCHEMA.items():
-        if not isinstance(config[section], dict) or set(config[section]) != keys:
+        if (
+            not isinstance(config[section], dict)
+            or set(config[section]) - ({"task_format"} if section == "benchmark" else set()) != keys
+        ):
             raise ValueError(f"{section}: expected exactly {sorted(keys)}")
     for section, keys in {
         "model": ["max_context_tokens", "head_chunk"],
@@ -72,7 +75,7 @@ def validate_config(config: dict):
     if type(config["generation"]["enable_thinking"]) is not bool:
         raise ValueError("enable_thinking must be boolean")
     objective = config["objective"]
-    if objective["mode"] not in {"accuracy", "success_likelihood"}:
+    if objective["mode"] not in {"accuracy", "success_likelihood", "success_likelihood_ascent"}:
         raise ValueError("Unknown objective mode")
     for key in ("weight", "max_accuracy_drop", "tolerance"):
         value = objective[key]
@@ -91,6 +94,28 @@ def validate_config(config: dict):
         raise ValueError("accuracy objective requires weight=0")
     if objective["likelihood_feedback"] and not objective["measure_likelihood"]:
         raise ValueError("likelihood_feedback requires measure_likelihood=true")
+    if "textgrad" in config:
+        settings = config["textgrad"]
+        if (
+            set(settings) != {"proposals_per_batch"}
+            or type(settings["proposals_per_batch"]) is not int
+            or settings["proposals_per_batch"] < 1
+        ):
+            raise ValueError("textgrad requires positive integer proposals_per_batch")
+        if objective["score_failures"]:
+            raise ValueError("TextGrad first version requires score_failures=false")
+        if objective["mode"] not in {"accuracy", "success_likelihood_ascent"} or objective["weight"] != 0:
+            raise ValueError(
+                "TextGrad uses accuracy or success_likelihood_ascent, without an additive weight"
+            )
+        if objective["mode"] == "success_likelihood_ascent" and not (
+            objective["measure_likelihood"] and objective["likelihood_feedback"]
+        ):
+            raise ValueError("TextGrad likelihood ascent requires measurement and numerical feedback")
+        if objective["mode"] == "accuracy" and objective["likelihood_feedback"]:
+            raise ValueError("Accuracy-only TextGrad must not receive likelihood feedback")
+    elif objective["mode"] == "success_likelihood_ascent":
+        raise ValueError("success_likelihood_ascent requires the textgrad optimizer")
     model = config["model"]
     if model["dtype"] not in {"float32", "bfloat16", "float16"}:
         raise ValueError("Unsupported dtype")
@@ -107,6 +132,12 @@ def load_config(path: Path):
     benchmark = load_benchmark(config["benchmark"], path.parent)
     if config["search"]["minibatch_size"] > len(benchmark.train):
         raise ValueError("minibatch_size exceeds train split size")
+    if (
+        "textgrad" in config
+        and config["search"]["max_task_rollouts"]
+        < len(benchmark.validation) * config["search"]["validation_rollouts"]
+    ):
+        raise ValueError("TextGrad budget cannot cover the initial complete validation")
     return config, benchmark
 
 

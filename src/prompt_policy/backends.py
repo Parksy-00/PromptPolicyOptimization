@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 from prompt_policy.artifacts import Recorder, file_sha256
+from prompt_policy.benchmarks import task_messages
 from prompt_policy.scoring import token_logprobs
 from prompt_policy.types import Generation
 
@@ -54,11 +55,14 @@ class LocalHFBackend:
             raise ValueError("Tokenizer/model must supply a pad or EOS token")
 
     def messages(self, prompt: str, question: str) -> list[dict]:
-        return [{"role": "system", "content": prompt}, {"role": "user", "content": question}]
+        return task_messages(prompt, question, self.config.get("benchmark", {}).get("task_format", "plain"))
 
     def prompt_ids(self, prompt: str, question: str) -> tuple[int, ...]:
+        return self._encode_messages(self.messages(prompt, question))
+
+    def _encode_messages(self, messages):
         ids = self.tokenizer.apply_chat_template(
-            self.messages(prompt, question),
+            messages,
             tokenize=True,
             add_generation_prompt=True,
             enable_thinking=self.config["generation"]["enable_thinking"],
@@ -84,7 +88,11 @@ class LocalHFBackend:
         import torch
 
         settings = self.config["reflection"] if reflection else self.config["generation"]
-        prefix = self.prompt_ids(prompt, question)
+        prefix = (
+            self._encode_messages(task_messages(prompt, question))
+            if reflection
+            else self.prompt_ids(prompt, question)
+        )
         self._check_length(len(prefix) + settings["max_new_tokens"])
         inputs = torch.tensor([prefix], device=next(self.model.parameters()).device, dtype=torch.long)
         kwargs = {

@@ -29,6 +29,25 @@ def extract_answer(text: str) -> str | None:
 
 
 def reward(text: str, answer: str, scorer: str) -> float:
+    if scorer == "dapo_dspy_v1":
+        sections = [(None, [])]
+        for line in text.splitlines():
+            match = re.match(r"\[\[ ## (\w+) ## \]\]", line.strip())
+            if match is None:
+                sections[-1][1].append(line)
+            else:
+                remaining = line[match.end() :].strip()
+                sections.append((match[1], [remaining] if remaining else []))
+        fields = {}
+        for name, lines in sections:
+            if name in ("reasoning", "answer") and name not in fields:
+                fields[name] = "\n".join(lines).strip()
+        if not fields.get("reasoning") or not fields.get("answer"):
+            return 0.0
+        try:
+            return float(int(fields["answer"]) == int(answer))
+        except ValueError:
+            return 0.0
     predicted = extract_answer(text)
     if predicted is None:
         return 0.0
@@ -58,8 +77,12 @@ class Benchmark:
 
 
 def load_benchmark(config: dict, base: Path) -> Benchmark:
-    if config["scorer"] not in {"exact_match", "numeric"}:
-        raise ValueError("scorer must be exact_match or numeric")
+    if config["scorer"] not in {"exact_match", "numeric", "dapo_dspy_v1"}:
+        raise ValueError("Unknown benchmark scorer")
+    if config.get("task_format", "plain") not in {"plain", "dapo_dspy_v1"}:
+        raise ValueError("Unknown task_format")
+    if (config.get("task_format") == "dapo_dspy_v1") != (config["scorer"] == "dapo_dspy_v1"):
+        raise ValueError("Historical DSPy rendering and scorer must be used together")
     splits, sources, ids, questions = {}, {}, set(), set()
     for split in ("train", "validation", "test"):
         path = (base / config[split]).resolve()
@@ -92,3 +115,27 @@ def load_benchmark(config: dict, base: Path) -> Benchmark:
         "fingerprint": digest({s: [asdict(x) for x in rows] for s, rows in splits.items()}),
     }
     return Benchmark(config["name"], config["scorer"], identity=identity, **splits)
+
+
+def task_messages(prompt: str, question: str, task_format="plain"):
+    if task_format == "plain":
+        return [{"role": "system", "content": prompt}, {"role": "user", "content": question}]
+    if task_format != "dapo_dspy_v1":
+        raise ValueError("Unknown task format")
+    wrapper = (
+        "Your input fields are:\n1. `problem` (str):\nYour output fields are:\n"
+        "1. `reasoning` (str): \n2. `answer` (str):\n"
+        "All interactions will be structured in the following way, with the appropriate values filled in.\n\n"
+        "[[ ## problem ## ]]\n{problem}\n\n[[ ## reasoning ## ]]\n{reasoning}\n\n"
+        "[[ ## answer ## ]]\n{answer}\n\n[[ ## completed ## ]]\n"
+        "In adhering to this structure, your objective is: \n        "
+    )
+    user = (
+        "[[ ## problem ## ]]\n" + question + "\n\nRespond with the corresponding output fields, "
+        "starting with the field `[[ ## reasoning ## ]]`, then `[[ ## answer ## ]]`, "
+        "and then ending with the marker for `[[ ## completed ## ]]`."
+    )
+    return [
+        {"role": "system", "content": wrapper + prompt.replace("\n", "\n        ")},
+        {"role": "user", "content": user},
+    ]
