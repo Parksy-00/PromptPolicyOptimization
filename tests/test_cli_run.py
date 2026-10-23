@@ -7,9 +7,9 @@ from conftest import FakeBackend
 from prompt_policy.cli import run
 
 
-def prepare_config(tmp_path):
+def prepare_config(tmp_path, *, editor=True):
     root = Path(__file__).resolve().parents[1]
-    text = (root / "experiments/qwen3_success_likelihood/experiment.toml").read_text()
+    text = (root / "tests/fixtures/base.toml").read_text()
     text = text.replace(
         'initial_prompt = "Solve the problem carefully. Put your final answer on a line starting with ###."',
         'initial_prompt = "parent"',
@@ -21,6 +21,9 @@ def prepare_config(tmp_path):
     text = text.replace("enable_thinking = true", "enable_thinking = false")
     for split in ("train", "validation", "test"):
         text = text.replace(f"../../examples/data/{split}.jsonl", str(root / f"examples/data/{split}.jsonl"))
+    if editor:
+        text = text[:text.index("[objective]")] + ('[objective]\nmode = "directional_likelihood"\n'
+            '[edit_refinement]\nmode = "validation_gated_per_example"\nscore_unit = "mean"\n')
     path = tmp_path / "experiment.toml"
     path.write_text(text)
     return path
@@ -38,7 +41,7 @@ def test_cli_writes_complete_run_and_refuses_overwrite(tmp_path, monkeypatch):
     assert manifest["model"]["kind"] == "test_only"
     selected = json.loads((output / "selection.json").read_text())
     result = json.loads((output / "result.json").read_text())
-    assert selected["criterion"] == "validation_accuracy"
+    assert selected["criterion"] == "last_likelihood_and_validation_verified_prompt"
     assert selected["prompt"] == result["selected_prompt"]
     assert result["test"]["selected"]["reused_initial"]
     assert result["search_cost"]["task_calls"] < result["total_cost"]["task_calls"]

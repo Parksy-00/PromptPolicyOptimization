@@ -1,0 +1,174 @@
+{
+  "executable": true,
+  "missing": [],
+  "config": {
+    "initial_prompt": "Solve the problem and provide the answer in the correct format.",
+    "benchmark": {
+      "allow_within_split_question_duplicates": true,
+      "name": "DAPOMathBench_seed0_canonical_150_300_300_boxed_v1",
+      "scorer": "boxed_integer_v1",
+      "task_format": "boxed_integer_v1",
+      "train": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/train.jsonl",
+      "validation": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/validation.jsonl",
+      "test": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/test.jsonl"
+    },
+    "model": {
+      "name_or_path": "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218",
+      "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "max_context_tokens": 40960,
+      "head_chunk": 256
+    },
+    "generation": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "max_new_tokens": 16384,
+      "enable_thinking": true
+    },
+    "reflection": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "max_new_tokens": 8192
+    },
+    "search": {
+      "minibatch_size": 3,
+      "train_rollouts": 1,
+      "validation_rollouts": 1,
+      "test_rollouts": 1,
+      "max_iterations": 5,
+      "max_task_rollouts": 12060,
+      "search_seed": 0
+    },
+    "gepa_refinement": {
+      "likelihood_scope": "full",
+      "drift_correction": "none",
+      "score_unit": "mean"
+    },
+    "objective": {
+      "mode": "directional_likelihood"
+    },
+    "serving": {
+      "base_url": "http://127.0.0.1:8018/v1",
+      "model": "qwen3-8b-pinned",
+      "max_concurrency": 16,
+      "timeout_seconds": 1800,
+      "server_manifest": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261020T041205Z-gepa-likelihood-refinement-3x1-gpu0/server.json"
+    }
+  },
+  "benchmark": {
+    "name": "DAPOMathBench_seed0_canonical_150_300_300_boxed_v1",
+    "scorer": "boxed_integer_v1",
+    "scorer_version": 1,
+    "sources": {
+      "train": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/train.jsonl",
+        "sha256": "6c910549e0ce5f80c73bbd4dcf4137d65653023a2089a3090ef7e1846682d584",
+        "count": 150
+      },
+      "validation": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/validation.jsonl",
+        "sha256": "4733ed175050978cdc538a7c86b3919601bed8fb6edd44946f04c81c731d3e66",
+        "count": 300
+      },
+      "test": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/test.jsonl",
+        "sha256": "a7024c7130a61522c0e908a8bdc0becdbbf2b6268796c68d4b0c4185d76b4641",
+        "count": 300
+      }
+    },
+    "fingerprint": "1e31f654e9afba8bf2f4b171492ef31ae2423c76b2147a0148b8d7dadbfe0c18",
+    "task_format": "boxed_integer_v1",
+    "fixed_output_rule": "Put your final answer at the end of your response in \\boxed{...}, with only a plain integer inside (e.g. \\boxed{42}).",
+    "question_duplicate_policy": "preserve_within_split_only",
+    "within_split_question_duplicates": [
+      {
+        "split": "test",
+        "first_id": "19efa660dbfc2ec91b551cbe4617ac32ad9e90612226c65e3c80c6fb5d8c0d90",
+        "duplicate_id": "307a4648b36eb51b4fdc6635a98264c812ae48f122c56a56f5d21a93fdc4a17d"
+      }
+    ]
+  },
+  "gepa": {
+    "repository": "https://github.com/gepa-ai/gepa",
+    "revision": "f1cfdee2856e9dc4b5b4dc5cc2e391d0aa20d819",
+    "patches": [],
+    "extension": "custom_candidate_proposer/fixed-parent-likelihood-refinement-v1"
+  },
+  "optimizer": "gepa",
+  "objective": "verify each retained parent success increases and failure decreases; choose verified edit by question-balanced signed gain; require GEPA native strict train accuracy improvement",
+  "final_selection": "validation_accuracy_only",
+  "notes": [
+    "No sampling seeds are sent; search_seed controls search minibatches only.",
+    "Budget checked between complete iterations; the last iteration can exceed it.",
+    "Built-in JSONL scorers do not claim canonical DAPO/GPQA equivalence.",
+    "This extension preserves GEPA native minibatch sampling, strict train gate and validation Pareto selection.",
+    "Full validation is a global accuracy score, not a parent-relative nondecrease admission filter.",
+    "One batch-level instruction is proposed/refined; individual trajectories must all pass direction checks.",
+    "No parseable evidence or no verified edit returns no update; no child rollout/validation is generated.",
+    "Editors see post-thinking text; original full response IDs including sampled EOS remain fixed targets.",
+    "Default GEPA proposal wording is preserved except its output boundary and a general-lessons sentence.",
+    "Proposal/refinement are compared against the same parent, not sequentially against each other.",
+    "Task accuracy, likelihood verification and final validation ranking remain separate."
+  ],
+  "task_interface": {
+    "task_format": "boxed_integer_v1",
+    "editable_component": "instruction_only",
+    "initial_instruction": "Solve the problem and provide the answer in the correct format.",
+    "fixed_output_rule": "Put your final answer at the end of your response in \\boxed{...}, with only a plain integer inside (e.g. \\boxed{42}).",
+    "initial_task_messages_example": [
+      {
+        "role": "system",
+        "content": "Solve the problem and provide the answer in the correct format."
+      },
+      {
+        "role": "user",
+        "content": "Put your final answer at the end of your response in \\boxed{...}, with only a plain integer inside (e.g. \\boxed{42}).\n\nQuestion:\nA large candle is $119$ centimeters tall. It is designed to burn down more quickly when it is first lit and more slowly as it approaches its bottom. Specifically, the candle takes $10$ seconds to burn down the first centimeter from the top, $20$ seconds to burn down the second centimeter, and $10k$ seconds to burn down the $k$-th centimeter. (The candle burns down each individual centimeter at a fixed rate.)\n\nSuppose it takes $T$ seconds for the candle to burn down completely. Compute the candle's height in centimeters $\\tfrac{T}{2}$ seconds after it is lit."
+      }
+    ],
+    "answer_filter": "last balanced \\boxed{...} outside thinking, containing only [+-]?[0-9]+; integer equality; no fallback"
+  },
+  "pipeline": [
+    "GEPA evaluates seed on full validation and selects a Pareto parent and native train minibatch",
+    "capture train_rollouts per question; retain answer-parseable responses for fixed-ID verification",
+    "one native GEPA-template proposal for the complete training batch (one USER message)",
+    "measure parent-fixed response IDs under original and proposed instructions",
+    "refine once with original/new instructions, post-thinking responses and inline mean-LP changes",
+    "remeasure exact same responses; choose highest-gain verified proposal/refinement; otherwise skip child",
+    "GEPA generates fresh child responses on same minibatch; require strict accuracy improvement",
+    "GEPA evaluates admitted child on full validation; update native accuracy Pareto frontier",
+    "freeze highest-validation candidate, then evaluate initial and selected prompts on test"
+  ],
+  "optimizer_prompts": {
+    "proposer_template": "I provided an assistant with the following instructions to perform a task for me:\n```\n<curr_param>\n```\n\nThe following are examples of different task inputs provided to the assistant along with the assistant's response for each of them, and some feedback on how the assistant's response could be better:\n```\n<side_info>\n```\n\nYour task is to write a new instruction for the assistant.\n\nRead the inputs carefully and identify the input format and infer detailed task description about the task I wish to solve with the assistant.\n\nRead all the assistant responses and the corresponding feedback. Identify all niche and domain specific factual information about the task and include it in the instruction, as a lot of it may not be available to the assistant in the future. The assistant may have utilized a generalizable strategy to solve the task, if so, include that in the instruction as well.\n\nWrite general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies. Return the complete updated instruction inside exactly one <instruction>...</instruction> block.",
+    "refiner_introduction": "Your task is to refine the new instruction by comparing it with the original instruction and using the observed responses and likelihood changes.",
+    "refiner_instructions": "Refine the new instruction using the observed responses and measured likelihood changes. For failed responses, diagnose what went wrong and write instructions that prevent the same failure.\nFor successful responses, identify useful behaviors and write instructions that help reproduce them.\nInfer which semantic component of the change from the original instruction to the new instruction caused the harmful likelihood changes identified in the feedback. Revise the new instruction to reinforce successful responses and suppress failed responses, preserving beneficial changes. Write general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies. Return the complete updated instruction inside exactly one <instruction>...</instruction> block."
+  },
+  "optimizer_input_contract": {
+    "roles": [
+      "user"
+    ],
+    "system_message": "omitted",
+    "proposal": "GEPA markdown rendering; task inputs/gold, visible responses, binary task reward",
+    "refinement": "original/new instruction, input/gold/responses, inline mean LP and change, feedback"
+  },
+  "optimizer_output_contract": {
+    "tag": "instruction",
+    "extraction": "exactly one nonempty block outside thinking",
+    "invalid_output": "record and skip proposal, or keep eligible proposal after invalid refinement; no retry"
+  },
+  "likelihood_measurement": {
+    "scope": "full",
+    "drift_correction": "none",
+    "score_unit": "mean",
+    "branch_probability_threshold": null,
+    "mask_source": "parent, fixed for both edits"
+  },
+  "edit_limits_per_outer_iteration": {
+    "optimizer_calls": 2,
+    "measured_candidates": 2,
+    "max_task_rollouts": 306
+  }
+}

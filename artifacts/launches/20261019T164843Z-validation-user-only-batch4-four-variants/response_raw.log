@@ -1,0 +1,247 @@
+Validation base: reused 300 verified responses from 20261019T125813Z-directional-boxed-parseable-16k-one-step-gpu01; accuracy=0.766667; no generation
+Step 1: rollout start (4 questions)
+Step 1: rewards=[0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0] tokens=[16384, 16384, 16384, 7165, 5712, 6554, 12583, 16384, 11927, 6518, 6962, 7902]
+Step 1: editor evidence=8/12 parseable responses
+Step 1 78b0211247a656b9802c0b378c7f1f27969c77096350fa5472230e0f91617e10: proposal verified=False mean_deltas=[-0.0013970052496527269, -0.008919943788861455, -0.00218335766699864]
+Step 1 78b0211247a656b9802c0b378c7f1f27969c77096350fa5472230e0f91617e10: refinement verified=False mean_deltas=[-0.0026738605691968395, -0.010253557206831155, -0.0027485756011265184]
+Step 1 cd218cedf3b31317766cea25c7271058b05c5b979f608d649b83bada28192d1e: proposal verified=True mean_deltas=[-0.0033474068475570365, -0.002909238374519952]
+Step 1 cd218cedf3b31317766cea25c7271058b05c5b979f608d649b83bada28192d1e: refinement verified=True mean_deltas=[-0.005418156021201664, -0.0053418879122301725]
+Step 1 3c1e3ab4b6c3e83556aab5ffa30b36afbc7620c3fb89c7fb2e045c1b11bf3283: proposal verified=False mean_deltas=[-0.002259411261840558, -0.004651483332612875, -0.004073697647022881]
+Step 1 3c1e3ab4b6c3e83556aab5ffa30b36afbc7620c3fb89c7fb2e045c1b11bf3283: refinement verified=False mean_deltas=[-0.0003264180672222678, -0.003764120909381666, -0.005643751118858239]
+Validation question3-proposal: start (300 questions x 1)
+Validation question3-proposal: 10/300 accuracy=1.0000
+Validation question3-proposal: 20/300 accuracy=0.9000
+Validation question3-proposal: 30/300 accuracy=0.8333
+Validation question3-proposal: 40/300 accuracy=0.8000
+Validation question3-proposal: 50/300 accuracy=0.8200
+Validation question3-proposal: 60/300 accuracy=0.8500
+Validation question3-proposal: 70/300 accuracy=0.8429
+Validation question3-proposal: 80/300 accuracy=0.8250
+Validation question3-proposal: 90/300 accuracy=0.8222
+Validation question3-proposal: 100/300 accuracy=0.8000
+Validation question3-proposal: 110/300 accuracy=0.7909
+Validation question3-proposal: 120/300 accuracy=0.7917
+Validation question3-proposal: 130/300 accuracy=0.7692
+Validation question3-proposal: 140/300 accuracy=0.7714
+Validation question3-proposal: 150/300 accuracy=0.7800
+Validation question3-proposal: 160/300 accuracy=0.7812
+Validation question3-proposal: 170/300 accuracy=0.7765
+Validation question3-proposal: 180/300 accuracy=0.7889
+Validation question3-proposal: 190/300 accuracy=0.7895
+Validation question3-proposal: 200/300 accuracy=0.7950
+Validation question3-proposal: 210/300 accuracy=0.8000
+Validation question3-proposal: 220/300 accuracy=0.7955
+Validation question3-proposal: 230/300 accuracy=0.7870
+Validation question3-proposal: 240/300 accuracy=0.7833
+Validation question3-proposal: 250/300 accuracy=0.7840
+Validation question3-proposal: 260/300 accuracy=0.7846
+Validation question3-proposal: 270/300 accuracy=0.7852
+Validation question3-proposal: 280/300 accuracy=0.7750
+Validation question3-proposal: 290/300 accuracy=0.7759
+Validation question3-proposal: 300/300 accuracy=0.7700
+Validation question3-proposal: accuracy=0.770000
+Validation question3-refinement: start (300 questions x 1)
+Validation question3-refinement: 10/300 accuracy=0.9000
+Validation question3-refinement: 20/300 accuracy=0.9500
+Validation question3-refinement: 30/300 accuracy=0.8000
+Validation question3-refinement: 40/300 accuracy=0.7500
+Validation question3-refinement: 50/300 accuracy=0.8000
+Validation question3-refinement: 60/300 accuracy=0.8000
+Validation question3-refinement: 70/300 accuracy=0.8000
+Validation question3-refinement: 80/300 accuracy=0.7875
+Validation question3-refinement: 90/300 accuracy=0.7889
+Validation question3-refinement: 100/300 accuracy=0.7900
+Validation question3-refinement: 110/300 accuracy=0.7909
+Validation question3-refinement: 120/300 accuracy=0.7833
+Validation question3-refinement: 130/300 accuracy=0.7615
+Validation question3-refinement: 140/300 accuracy=0.7500
+Validation question3-refinement: 150/300 accuracy=0.7600
+Validation question3-refinement: 160/300 accuracy=0.7625
+Validation question3-refinement: 170/300 accuracy=0.7588
+Validation question3-refinement: 180/300 accuracy=0.7611
+Validation question3-refinement: 190/300 accuracy=0.7632
+Validation question3-refinement: 200/300 accuracy=0.7700
+Validation question3-refinement: 210/300 accuracy=0.7667
+Validation question3-refinement: 220/300 accuracy=0.7727
+Validation question3-refinement: 230/300 accuracy=0.7522
+Validation question3-refinement: 240/300 accuracy=0.7542
+Validation question3-refinement: 250/300 accuracy=0.7600
+Validation question3-refinement: 260/300 accuracy=0.7577
+Validation question3-refinement: 270/300 accuracy=0.7630
+Validation question3-refinement: 280/300 accuracy=0.7643
+Validation question3-refinement: 290/300 accuracy=0.7586
+Validation question3-refinement: 300/300 accuracy=0.7567
+Validation question3-refinement: accuracy=0.756667
+Step 1: accepted=True validation=0.7667->0.7700
+Step 2: rollout start (4 questions)
+Step 2: rewards=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0] tokens=[2847, 3016, 2669, 6586, 6205, 5287, 6952, 6356, 7623, 16384, 15879, 14978]
+Step 2: editor evidence=11/12 parseable responses
+Step 2 fab58ab944ebde596d20616bfdf6a0abca33c0e918f660c8f992fbf3fdd0ccdf: proposal verified=False mean_deltas=[-0.0047203822149034435, -0.004571410397931502, 0.0002428587906183615]
+Step 2 fab58ab944ebde596d20616bfdf6a0abca33c0e918f660c8f992fbf3fdd0ccdf: refinement verified=False mean_deltas=[-0.013591692682210773, -0.005782653730140753, -0.007025790683861948]
+Step 2 b75c9baaa2d460fd319689a111aef4a32df42e17568a991ddfa3eef121535b32: proposal verified=False mean_deltas=[-0.0020788228421465206, -0.004164223504480486, -0.004106460083215323]
+Step 2 b75c9baaa2d460fd319689a111aef4a32df42e17568a991ddfa3eef121535b32: refinement verified=False mean_deltas=[-0.0011628314934340879, -0.007084739575502139, -0.0074561644508397045]
+Step 2 3666c50bd01fef9a83a08b42c64cd1405750e1848f71122c609bc4abee0c245f: proposal verified=False mean_deltas=[-0.008167688536728068, -0.0026864976153705197, -0.0023767812114855224]
+Step 2 3666c50bd01fef9a83a08b42c64cd1405750e1848f71122c609bc4abee0c245f: refinement verified=False mean_deltas=[-0.010717960215748983, -0.001991521986397982, -0.0034040117430634534]
+Step 2 70522aa1c281dd8c98daff7a13faa91ff6883deef7413ed2270f32ce52e6eb10: proposal verified=False mean_deltas=[-0.009460524650506593, -0.0027637282266865875]
+Step 2 70522aa1c281dd8c98daff7a13faa91ff6883deef7413ed2270f32ce52e6eb10: refinement verified=False mean_deltas=[-0.00958337901194026, -0.0029404522109172295]
+Step 2: accepted=False validation=0.7700->0.7700
+Step 3: rollout start (4 questions)
+Step 3: rewards=[1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] tokens=[5319, 5756, 6768, 16384, 16384, 16384, 5583, 4099, 3024, 7113, 6957, 7046]
+Step 3: editor evidence=9/12 parseable responses
+Step 3 804242175d6c4831bf94b5a9db109b5ac9e4c9d37b7343a40986ae197bdf3d68: proposal verified=False mean_deltas=[-0.010369939406242649, -0.009094495913104166, -0.004561843137943308]
+Step 3 804242175d6c4831bf94b5a9db109b5ac9e4c9d37b7343a40986ae197bdf3d68: refinement verified=False mean_deltas=[-0.026886639069966304, -0.01043900240757343, -0.016193669557172472]
+Step 3 9ca1815c5c5e16fa0b6a2a60a2d0f5eb74d14093ad4de3036c17004bf84d50d4: proposal verified=False mean_deltas=[-0.010880818420924995, -0.00806100561129782, -0.008449408198839017]
+Step 3 9ca1815c5c5e16fa0b6a2a60a2d0f5eb74d14093ad4de3036c17004bf84d50d4: refinement verified=False mean_deltas=[-0.012345519019238306, -0.009802406772288873, -0.011736317461803293]
+Step 3 83055f45423e82b5ed7ce36d6cc694a5308d4c417f2804980a4654006d7a5523: proposal verified=False mean_deltas=[-0.005322827104370421, -0.0006231329046231496, -0.012044323631134958]
+Step 3 83055f45423e82b5ed7ce36d6cc694a5308d4c417f2804980a4654006d7a5523: refinement verified=False mean_deltas=[-0.0048218288146031985, -0.0011277555501137569, -0.011456830138251153]
+Step 3: accepted=False validation=0.7700->0.7700
+Step 4: rollout start (4 questions)
+Step 4: rewards=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0] tokens=[11075, 13929, 15207, 8402, 5690, 5827, 10375, 8545, 8315, 10522, 16384, 12447]
+Step 4: editor evidence=11/12 parseable responses
+Step 4 e274d912836a02a6c6012b4a39572cc4549dfe07fb481b9dd1b9e6287902fa95: proposal verified=False mean_deltas=[-0.0007140218008835279, -0.001388598480128663, -0.0020878760869891674]
+Step 4 e274d912836a02a6c6012b4a39572cc4549dfe07fb481b9dd1b9e6287902fa95: refinement verified=False mean_deltas=[-0.0017906179388519523, -0.0024949706349844504, -0.0027868352128390303]
+Step 4 6734004d3911398d4c6f7ced1efca8bcd8c7959d84e938e719539d612bb573e2: proposal verified=False mean_deltas=[0.00048771635939853217, 0.0017796818953781616, -0.0058138010088626966]
+Step 4 6734004d3911398d4c6f7ced1efca8bcd8c7959d84e938e719539d612bb573e2: refinement verified=False mean_deltas=[0.0009216221078061406, 0.0027598844074850637, -0.007165820208635319]
+Step 4 4b2a6e5655f437a8b92412813ac35a492a5f68710c7bfe9a6ec41abf763c8e52: proposal verified=False mean_deltas=[-0.0014029007673936767, -0.0034387660884748305, -0.005332826732313087]
+Step 4 4b2a6e5655f437a8b92412813ac35a492a5f68710c7bfe9a6ec41abf763c8e52: refinement verified=False mean_deltas=[-0.0023279780245004096, -0.004503883345194877, -0.00654073702540271]
+Step 4 53c4af07ab00828e58449c1e3fca882ee1a7ffddbcd784c5eea6a8affc2156fe: proposal verified=False mean_deltas=[-0.014069589015598082, -0.00914093953488423]
+Step 4 53c4af07ab00828e58449c1e3fca882ee1a7ffddbcd784c5eea6a8affc2156fe: refinement verified=False mean_deltas=[-0.016766919247357175, -0.010417587435325535]
+Step 4: accepted=False validation=0.7700->0.7700
+Step 5: rollout start (4 questions)
+Step 5: rewards=[0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] tokens=[16384, 14474, 10429, 9399, 8821, 12350, 2047, 3352, 3029, 15021, 13057, 14645]
+Step 5: editor evidence=11/12 parseable responses
+Step 5 7a3b5d085614f516f152da3d781a064fb5b04c6b7ace2d0c3f2e7bb04a18f3b8: proposal verified=True mean_deltas=[-0.0019701737675484696, -0.009240836892713]
+Step 5 7a3b5d085614f516f152da3d781a064fb5b04c6b7ace2d0c3f2e7bb04a18f3b8: refinement verified=True mean_deltas=[-0.004112013125180945, -0.011025279543810456]
+Step 5 d4d1491e0a2a60c8b3cd0124fae1c44a8c2bb20dca12002b5008c798d21c3514: proposal verified=False mean_deltas=[-0.0015312721982259213, 0.0010720819406992022, 0.0005518250781574647]
+Step 5 d4d1491e0a2a60c8b3cd0124fae1c44a8c2bb20dca12002b5008c798d21c3514: refinement verified=False mean_deltas=[-0.0022163094577671086, 0.0011442041946384115, 0.0001636235256316762]
+Step 5 10ca5b6ca553ba525afa73c77d09db8ef7e17a2cdbc9d29bb0f0b5993eac6c0d: proposal verified=False mean_deltas=[-0.015345602400670722, -0.01624822890641852, -0.029353036352097853]
+Step 5 10ca5b6ca553ba525afa73c77d09db8ef7e17a2cdbc9d29bb0f0b5993eac6c0d: refinement verified=False mean_deltas=[-0.01901526329003832, -0.01891395813545152, -0.03038017692453081]
+Step 5 76a0935a544dec2ef028277cbf88d57e16400c5a22f954218a0f3645e6fb518b: proposal verified=False mean_deltas=[0.0036681962724315806, -0.01845705524731906, -0.010252488312431893]
+Step 5 76a0935a544dec2ef028277cbf88d57e16400c5a22f954218a0f3645e6fb518b: refinement verified=False mean_deltas=[0.006859908120995107, -0.018246518330022686, -0.01643685805462842]
+Validation question1-proposal: start (300 questions x 1)
+Validation question1-proposal: 10/300 accuracy=1.0000
+Validation question1-proposal: 20/300 accuracy=0.9500
+Validation question1-proposal: 30/300 accuracy=0.9000
+Validation question1-proposal: 40/300 accuracy=0.9000
+Validation question1-proposal: 50/300 accuracy=0.8800
+Validation question1-proposal: 60/300 accuracy=0.8667
+Validation question1-proposal: 70/300 accuracy=0.8714
+Validation question1-proposal: 80/300 accuracy=0.8375
+Validation question1-proposal: 90/300 accuracy=0.8333
+Validation question1-proposal: 100/300 accuracy=0.8200
+Validation question1-proposal: 110/300 accuracy=0.8091
+Validation question1-proposal: 120/300 accuracy=0.8000
+Validation question1-proposal: 130/300 accuracy=0.7846
+Validation question1-proposal: 140/300 accuracy=0.8000
+Validation question1-proposal: 150/300 accuracy=0.7933
+Validation question1-proposal: 160/300 accuracy=0.7937
+Validation question1-proposal: 170/300 accuracy=0.8000
+Validation question1-proposal: 180/300 accuracy=0.8056
+Validation question1-proposal: 190/300 accuracy=0.8053
+Validation question1-proposal: 200/300 accuracy=0.8150
+Validation question1-proposal: 210/300 accuracy=0.8095
+Validation question1-proposal: 220/300 accuracy=0.8136
+Validation question1-proposal: 230/300 accuracy=0.7957
+Validation question1-proposal: 240/300 accuracy=0.7875
+Validation question1-proposal: 250/300 accuracy=0.7880
+Validation question1-proposal: 260/300 accuracy=0.7846
+Validation question1-proposal: 270/300 accuracy=0.7889
+Validation question1-proposal: 280/300 accuracy=0.7786
+Validation question1-proposal: 290/300 accuracy=0.7793
+Validation question1-proposal: 300/300 accuracy=0.7700
+Validation question1-proposal: accuracy=0.770000
+Validation question1-refinement: start (300 questions x 1)
+Validation question1-refinement: 10/300 accuracy=1.0000
+Validation question1-refinement: 20/300 accuracy=0.9500
+Validation question1-refinement: 30/300 accuracy=0.8667
+Validation question1-refinement: 40/300 accuracy=0.8500
+Validation question1-refinement: 50/300 accuracy=0.8400
+Validation question1-refinement: 60/300 accuracy=0.8333
+Validation question1-refinement: 70/300 accuracy=0.8286
+Validation question1-refinement: 80/300 accuracy=0.8125
+Validation question1-refinement: 90/300 accuracy=0.7889
+Validation question1-refinement: 100/300 accuracy=0.7900
+Validation question1-refinement: 110/300 accuracy=0.7909
+Validation question1-refinement: 120/300 accuracy=0.7917
+Validation question1-refinement: 130/300 accuracy=0.7846
+Validation question1-refinement: 140/300 accuracy=0.7857
+Validation question1-refinement: 150/300 accuracy=0.7800
+Validation question1-refinement: 160/300 accuracy=0.7875
+Validation question1-refinement: 170/300 accuracy=0.7824
+Validation question1-refinement: 180/300 accuracy=0.7833
+Validation question1-refinement: 190/300 accuracy=0.7842
+Validation question1-refinement: 200/300 accuracy=0.7900
+Validation question1-refinement: 210/300 accuracy=0.7857
+Validation question1-refinement: 220/300 accuracy=0.7864
+Validation question1-refinement: 230/300 accuracy=0.7739
+Validation question1-refinement: 240/300 accuracy=0.7750
+Validation question1-refinement: 250/300 accuracy=0.7640
+Validation question1-refinement: 260/300 accuracy=0.7731
+Validation question1-refinement: 270/300 accuracy=0.7741
+Validation question1-refinement: 280/300 accuracy=0.7679
+Validation question1-refinement: 290/300 accuracy=0.7655
+Validation question1-refinement: 300/300 accuracy=0.7667
+Validation question1-refinement: accuracy=0.766667
+Step 5: accepted=True validation=0.7700->0.7700
+Search complete: selected candidate 3; starting frozen-prompt test
+Test initial: 10/300
+Test initial: 20/300
+Test initial: 30/300
+Test initial: 40/300
+Test initial: 50/300
+Test initial: 60/300
+Test initial: 70/300
+Test initial: 80/300
+Test initial: 90/300
+Test initial: 100/300
+Test initial: 110/300
+Test initial: 120/300
+Test initial: 130/300
+Test initial: 140/300
+Test initial: 150/300
+Test initial: 160/300
+Test initial: 170/300
+Test initial: 180/300
+Test initial: 190/300
+Test initial: 200/300
+Test initial: 210/300
+Test initial: 220/300
+Test initial: 230/300
+Test initial: 240/300
+Test initial: 250/300
+Test initial: 260/300
+Test initial: 270/300
+Test initial: 280/300
+Test initial: 290/300
+Test initial: 300/300
+Test selected: 10/300
+Test selected: 20/300
+Test selected: 30/300
+Test selected: 40/300
+Test selected: 50/300
+Test selected: 60/300
+Test selected: 70/300
+Test selected: 80/300
+Test selected: 90/300
+Test selected: 100/300
+Test selected: 110/300
+Test selected: 120/300
+Test selected: 130/300
+Test selected: 140/300
+Test selected: 150/300
+Test selected: 160/300
+Test selected: 170/300
+Test selected: 180/300
+Test selected: 190/300
+Test selected: 200/300
+Test selected: 210/300
+Test selected: 220/300
+Test selected: 230/300
+Test selected: 240/300
+Test selected: 250/300
+Test selected: 260/300
+Test selected: 270/300
+Test selected: 280/300
+Test selected: 290/300
+Test selected: 300/300
+Completed: /home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-response_raw-gpu1

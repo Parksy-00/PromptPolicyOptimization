@@ -1,0 +1,52 @@
+initial_prompt = "Solve the problem and provide the answer in the correct format."
+
+[benchmark]
+name = "DAPO_seed0_archived_train32_test6_vllm_pilot"
+scorer = "answer_integer_v1"
+task_format = "answer_integer_v1"
+train = "../../artifacts/inputs/dapo_seed0_train32_test6/train.jsonl"
+validation = "../../artifacts/inputs/dapo_seed0_train32_test6/validation.jsonl"
+test = "../../artifacts/inputs/dapo_seed0_train32_test6/test.jsonl"
+
+[model]
+name_or_path = "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218"
+revision = "b968826d9c46dd6066d109eabc6255188de91218"
+device = "cuda:0"
+dtype = "bfloat16"
+max_context_tokens = 40960
+head_chunk = 256
+
+[generation]
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_new_tokens = 8192
+enable_thinking = true
+
+[reflection]
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_new_tokens = 8192
+
+[search]
+minibatch_size = 3
+train_rollouts = 1
+test_rollouts = 1
+max_iterations = 12
+max_task_rollouts = 36
+search_seed = 0
+
+# Selects the minimal loop; no branch, ablation or refinement-count settings.
+[edit_refinement]
+
+[objective]
+mode = "directional_likelihood"
+
+# Transport settings; same frozen server performs generation and fixed-ID scoring.
+[serving]
+base_url = "http://127.0.0.1:8017/v1"
+model = "qwen3-8b-pinned"
+max_concurrency = 3
+timeout_seconds = 1800
+server_manifest = "../../artifacts/servers/20261019-directional-edit-vllm-gpu1/server.json"

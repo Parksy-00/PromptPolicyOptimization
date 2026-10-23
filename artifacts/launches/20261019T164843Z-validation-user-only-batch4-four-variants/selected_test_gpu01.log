@@ -1,0 +1,33 @@
+{"at": "2026-10-20T07:22:19.255842+00:00", "event": "selected_test_gpu01_started", "source_run": "20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1", "evaluation_run": "20261020T072116Z-branch-selected-test-continuation-gpu01", "questions": 300, "gpus": [0, 1]}
+Test selected: 10/300
+Test selected: 20/300
+Test selected: 30/300
+Test selected: 40/300
+Test selected: 50/300
+Test selected: 60/300
+Test selected: 70/300
+Test selected: 80/300
+Test selected: 90/300
+Test selected: 100/300
+Test selected: 110/300
+Test selected: 120/300
+Test selected: 130/300
+Test selected: 140/300
+Test selected: 150/300
+Test selected: 160/300
+Test selected: 170/300
+Test selected: 180/300
+Test selected: 190/300
+Test selected: 200/300
+Test selected: 210/300
+Test selected: 220/300
+Test selected: 230/300
+Test selected: 240/300
+Test selected: 250/300
+Test selected: 260/300
+Test selected: 270/300
+Test selected: 280/300
+Test selected: 290/300
+Test selected: 300/300
+{"at": "2026-10-20T08:02:18.894031+00:00", "event": "selected_test_gpu01_complete", "accuracy": 0.7166666666666667, "gpus": [0, 1], "evaluation_run": "20261020T072116Z-branch-selected-test-continuation-gpu01"}
+{"at": "2026-10-20T08:02:19.084110+00:00", "event": "suite_finished", "status": "complete"}

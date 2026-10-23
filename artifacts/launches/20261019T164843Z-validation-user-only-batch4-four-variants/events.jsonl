@@ -1,0 +1,11 @@
+{"at": "2026-10-19T16:54:18.083335+00:00", "event": "condition_started", "condition": "full_raw", "gpu": 0, "pid": 2673959}
+{"at": "2026-10-19T16:54:18.133697+00:00", "event": "condition_started", "condition": "response_raw", "gpu": 1, "pid": 2673963}
+{"at": "2026-10-20T00:52:17.912806+00:00", "event": "condition_finished", "condition": "response_raw", "status": "complete", "returncode": 0}
+{"at": "2026-10-20T00:52:17.917118+00:00", "event": "condition_started", "condition": "branch_raw", "gpu": 1, "pid": 2970646}
+{"at": "2026-10-20T03:39:53.635927+00:00", "event": "condition_finished", "condition": "full_raw", "status": "complete", "returncode": 0}
+{"at": "2026-10-20T03:39:53.640000+00:00", "event": "condition_started", "condition": "full_question_centered", "gpu": 0, "pid": 3276367}
+{"at": "2026-10-20T05:36:03.095745+00:00", "event": "condition_finished", "condition": "full_question_centered", "status": "complete", "returncode": 0}
+{"event": "user_requested_selected_only_gpu01_handoff", "at": "2026-10-20T07:17:35.424397+00:00", "reason": "User requested cancellation of duplicate base test and final selected test on GPU0+1", "source_run": "20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1", "initial_test_completed_retained": 203, "selected_test_completed_retained": 0, "terminated_process_group": 2970646, "superseded_controller_pid": 2673957, "servers_preserved": true, "handoff_directory": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/selected-test-handoff-20261020T071735Z"}
+{"at": "2026-10-20T07:22:19.255842+00:00", "event": "selected_test_gpu01_started", "source_run": "20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1", "evaluation_run": "20261020T072116Z-branch-selected-test-continuation-gpu01", "questions": 300, "gpus": [0, 1]}
+{"at": "2026-10-20T08:02:18.894031+00:00", "event": "selected_test_gpu01_complete", "accuracy": 0.7166666666666667, "gpus": [0, 1], "evaluation_run": "20261020T072116Z-branch-selected-test-continuation-gpu01"}
+{"at": "2026-10-20T08:02:19.084110+00:00", "event": "suite_finished", "status": "complete"}

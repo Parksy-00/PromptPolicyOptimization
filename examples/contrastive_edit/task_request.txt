@@ -1,0 +1,8 @@
+SYSTEM
+Solve the problem and provide the answer in the correct format.
+
+USER
+Put your final answer at the end of your response in \boxed{...}, with only a plain integer inside (e.g. \boxed{42}).
+
+Question:
+1 + 1 = ?

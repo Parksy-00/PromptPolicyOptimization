@@ -15,7 +15,7 @@ from prompt_policy.types import Generation
 @pytest.fixture
 def config():
     root = Path(__file__).resolve().parents[1]
-    value, _ = load_config(root / "experiments/qwen3_success_likelihood/experiment.toml")
+    value, _ = load_config(root / "tests/fixtures/base.toml")
     value = copy.deepcopy(value)
     value["search"].update(
         max_iterations=1, minibatch_size=2, train_rollouts=2, validation_rollouts=2, max_task_rollouts=100

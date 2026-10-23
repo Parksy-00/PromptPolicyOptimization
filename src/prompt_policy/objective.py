@@ -128,3 +128,87 @@ def textgrad_eligibility(parent, candidate, parent_accuracy, candidate_accuracy,
         if gain["sequence_gain"] <= settings["tolerance"]:
             return False, "fixed-parent success likelihood did not increase"
     return True, "eligible"
+
+
+def fixed_directional_gain(parent, candidate, references, scorer, *, settings=None):
+    """Fixed parent masks; optionally center mean-LP changes within each question."""
+    if not references or any(t.prompt != parent or t.split != "train" for t in references):
+        raise ValueError("Nonempty fixed parent train trajectories required")
+    settings = settings or {}
+    scope = settings.get("likelihood_scope", "full")
+    correction = settings.get("drift_correction", "none")
+    unit = settings.get("score_unit", "sequence")
+    rows, grouped = [], defaultdict(list)
+    for t in references:
+        if t.reward not in {0, 1}:
+            raise ValueError("Binary rewards required")
+        old, new = scorer.score(parent, t), scorer.score(candidate, t)
+        if scope == "response":
+            positions = scorer.backend.response_token_indices(t)
+        elif scope == "branch":
+            if old.top1_logprobs is None:
+                raise ValueError("Branch scoring requires full-vocabulary parent top-1 probabilities")
+            cutoff = math.log(settings["branch_probability_threshold"])
+            positions = tuple(i for i, v in enumerate(old.top1_logprobs) if v < cutoff)
+        else:
+            positions = tuple(range(len(t.response_ids)))
+        old_sum = math.fsum(old.token_logprobs[i] for i in positions)
+        new_sum = math.fsum(new.token_logprobs[i] for i in positions)
+        delta = new_sum - old_sum
+        mean_delta = delta / len(positions) if positions else None
+        raw_gain = delta if unit == "sequence" else mean_delta
+        row = {
+            "example_id": t.example_id,
+            "repeat_index": t.repeat_index,
+            "reward": t.reward,
+            "parent_logprob": old_sum if positions else None,
+            "candidate_logprob": new_sum if positions else None,
+            "delta_logprob": delta if positions else None,
+            "parent_mean_logprob": old_sum / len(positions) if positions else None,
+            "candidate_mean_logprob": new_sum / len(positions) if positions else None,
+            "delta_mean_logprob": mean_delta,
+            "full_delta_mean_logprob": new.mean - old.mean,
+            "selected_token_indices": positions,
+            "selected_tokens": len(positions),
+            "total_tokens": len(t.response_ids),
+            "raw_gain": raw_gain,
+            "question_drift": None,
+            "corrected_delta_mean_logprob": None,
+            "verifiable": bool(positions),
+            "unverifiable_reason": None if positions else "no tokens in the fixed scoring mask",
+        }
+        rows.append(row)
+        grouped[t.example_id].append(row)
+    for group in grouped.values():
+        measured = [r for r in group if r["verifiable"]]
+        if correction == "question_mean":
+            drift = math.fsum(r["delta_mean_logprob"] for r in measured) / len(measured) if measured else None
+            informative = len(measured) >= 2 and {r["reward"] for r in measured} == {0, 1}
+            for row in group:
+                row["question_drift"] = drift
+                if row["verifiable"]:
+                    row["corrected_delta_mean_logprob"] = row["delta_mean_logprob"] - drift
+                    row["raw_gain"] = row["corrected_delta_mean_logprob"]
+                if not informative:
+                    row["verifiable"] = False
+                    row["unverifiable_reason"] = (
+                        "question-mean correction needs observed successes and failures"
+                    )
+    signed = []
+    for t, row in zip(references, rows, strict=True):
+        value = row.pop("raw_gain")
+        gain = (2 * t.reward - 1) * value if value is not None else None
+        if gain is not None and not math.isfinite(gain):
+            raise ValueError("Non-finite likelihood change")
+        row["signed_gain"] = gain
+        row["direction_correct"] = row["verifiable"] and gain is not None and gain > 0
+        if row["verifiable"]:
+            signed.append((t, gain))
+    return {
+        "score": grouped_mean(signed),
+        "verified": candidate != parent and all(r["direction_correct"] for r in rows),
+        "likelihood_scope": scope,
+        "drift_correction": correction,
+        "score_unit": unit,
+        "trajectories": rows,
+    }

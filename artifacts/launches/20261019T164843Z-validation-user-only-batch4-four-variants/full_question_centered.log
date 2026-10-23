@@ -1,0 +1,87 @@
+Validation base: reused 300 verified responses from 20261019T125813Z-directional-boxed-parseable-16k-one-step-gpu01; accuracy=0.766667; no generation
+Step 1: rollout start (4 questions)
+Step 1: rewards=[0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0] tokens=[16384, 16384, 16384, 5626, 4901, 5271, 15856, 11861, 13345, 6981, 8889, 6845]
+Step 1: editor evidence=9/12 parseable responses
+Step 1 78b0211247a656b9802c0b378c7f1f27969c77096350fa5472230e0f91617e10: proposal verified=False mean_deltas=[-0.020319450698322975, -0.031245746532010267, -0.029054608899101587]
+Step 1 78b0211247a656b9802c0b378c7f1f27969c77096350fa5472230e0f91617e10: refinement verified=False mean_deltas=[-0.02415952765571075, -0.03415552247476076, -0.029425372756947035]
+Step 1 cd218cedf3b31317766cea25c7271058b05c5b979f608d649b83bada28192d1e: proposal verified=False mean_deltas=[-0.02132848517525367, -0.029068928669921563, -0.020251001706719608]
+Step 1 cd218cedf3b31317766cea25c7271058b05c5b979f608d649b83bada28192d1e: refinement verified=False mean_deltas=[-0.0224414670211068, -0.030466031521718142, -0.021075182752327178]
+Step 1 3c1e3ab4b6c3e83556aab5ffa30b36afbc7620c3fb89c7fb2e045c1b11bf3283: proposal verified=False mean_deltas=[-0.020982335268204293, -0.019114511654825486, -0.027802726264925134]
+Step 1 3c1e3ab4b6c3e83556aab5ffa30b36afbc7620c3fb89c7fb2e045c1b11bf3283: refinement verified=False mean_deltas=[-0.025011239284735413, -0.02208348537763987, -0.03156826317307157]
+Step 1: accepted=False validation=0.7667->0.7667
+Step 2: rollout start (4 questions)
+Step 2: rewards=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0] tokens=[2854, 2182, 3148, 8156, 6948, 6845, 3193, 5539, 3775, 15585, 16384, 16384]
+Step 2: editor evidence=10/12 parseable responses
+Step 2 fab58ab944ebde596d20616bfdf6a0abca33c0e918f660c8f992fbf3fdd0ccdf: proposal verified=False mean_deltas=[-0.039042784119219166, -0.04048391802169265, -0.03823709358615042]
+Step 2 fab58ab944ebde596d20616bfdf6a0abca33c0e918f660c8f992fbf3fdd0ccdf: refinement verified=False mean_deltas=[-0.04429083377847963, -0.05098376513336535, -0.0424478731885556]
+Step 2 b75c9baaa2d460fd319689a111aef4a32df42e17568a991ddfa3eef121535b32: proposal verified=False mean_deltas=[-0.02366432204135174, -0.021321098092256595, -0.02173879917068246]
+Step 2 b75c9baaa2d460fd319689a111aef4a32df42e17568a991ddfa3eef121535b32: refinement verified=False mean_deltas=[-0.024246053558561822, -0.02034631261120251, -0.02236027636614428]
+Step 2 3666c50bd01fef9a83a08b42c64cd1405750e1848f71122c609bc4abee0c245f: proposal verified=False mean_deltas=[-0.02608581324996156, -0.016433469436741864, -0.016419369654628424]
+Step 2 3666c50bd01fef9a83a08b42c64cd1405750e1848f71122c609bc4abee0c245f: refinement verified=False mean_deltas=[-0.037561806606193814, -0.02884775237252971, -0.028264898106303678]
+Step 2 70522aa1c281dd8c98daff7a13faa91ff6883deef7413ed2270f32ce52e6eb10: proposal verified=False mean_deltas=[-0.013922254559573563]
+Step 2 70522aa1c281dd8c98daff7a13faa91ff6883deef7413ed2270f32ce52e6eb10: refinement verified=False mean_deltas=[-0.022769405010148912]
+Step 2: accepted=False validation=0.7667->0.7667
+Step 3: rollout start (4 questions)
+Step 3: rewards=[1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] tokens=[5379, 4813, 4631, 16384, 16384, 16384, 3885, 3739, 4365, 7795, 8528, 7642]
+Step 3: editor evidence=9/12 parseable responses
+Step 3 804242175d6c4831bf94b5a9db109b5ac9e4c9d37b7343a40986ae197bdf3d68: proposal verified=False mean_deltas=[-0.03233014266514972, -0.0474600024695605, -0.035878551839483276]
+Step 3 804242175d6c4831bf94b5a9db109b5ac9e4c9d37b7343a40986ae197bdf3d68: refinement verified=False mean_deltas=[-0.03800665069050408, -0.05348067309595854, -0.04176018094770617]
+Step 3 9ca1815c5c5e16fa0b6a2a60a2d0f5eb74d14093ad4de3036c17004bf84d50d4: proposal verified=False mean_deltas=[-0.02477791164416658, -0.030915495071146677, -0.02922626322621361]
+Step 3 9ca1815c5c5e16fa0b6a2a60a2d0f5eb74d14093ad4de3036c17004bf84d50d4: refinement verified=False mean_deltas=[-0.04327005150651854, -0.04993795799119411, -0.045226866941113456]
+Step 3 83055f45423e82b5ed7ce36d6cc694a5308d4c417f2804980a4654006d7a5523: proposal verified=False mean_deltas=[-0.02466321379231765, -0.02224269176721917, -0.022656535238848127]
+Step 3 83055f45423e82b5ed7ce36d6cc694a5308d4c417f2804980a4654006d7a5523: refinement verified=False mean_deltas=[-0.03297846097046897, -0.02862953361378944, -0.029172574547171985]
+Step 3: accepted=False validation=0.7667->0.7667
+Step 4: rollout start (4 questions)
+Step 4: rewards=[0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0] tokens=[16384, 14119, 9570, 8722, 9241, 6313, 10255, 9950, 8076, 14332, 16317, 9400]
+Step 4: editor evidence=11/12 parseable responses
+Step 4 e274d912836a02a6c6012b4a39572cc4549dfe07fb481b9dd1b9e6287902fa95: proposal verified=False mean_deltas=[-0.012257857769872604, -0.013843192791366104]
+Step 4 e274d912836a02a6c6012b4a39572cc4549dfe07fb481b9dd1b9e6287902fa95: refinement verified=False mean_deltas=[-0.0131484228409542, -0.01410168439041612]
+Step 4 6734004d3911398d4c6f7ced1efca8bcd8c7959d84e938e719539d612bb573e2: proposal verified=False mean_deltas=[-0.02848274271356174, -0.023020582438889884, -0.029022734193606178]
+Step 4 6734004d3911398d4c6f7ced1efca8bcd8c7959d84e938e719539d612bb573e2: refinement verified=False mean_deltas=[-0.03166517444483157, -0.027066026622320615, -0.032217900961248866]
+Step 4 4b2a6e5655f437a8b92412813ac35a492a5f68710c7bfe9a6ec41abf763c8e52: proposal verified=False mean_deltas=[-0.013539729362518377, -0.0113052580028931, -0.010162611851074319]
+Step 4 4b2a6e5655f437a8b92412813ac35a492a5f68710c7bfe9a6ec41abf763c8e52: refinement verified=False mean_deltas=[-0.01483485223648803, -0.013171166308215125, -0.012287226892405616]
+Step 4 53c4af07ab00828e58449c1e3fca882ee1a7ffddbcd784c5eea6a8affc2156fe: proposal verified=False mean_deltas=[-0.04147689180191555, -0.048194244040238546, -0.05072622254752753]
+Step 4 53c4af07ab00828e58449c1e3fca882ee1a7ffddbcd784c5eea6a8affc2156fe: refinement verified=False mean_deltas=[-0.045017882446632816, -0.05143916418829084, -0.05443811034133036]
+Step 4: accepted=False validation=0.7667->0.7667
+Step 5: rollout start (4 questions)
+Step 5: rewards=[0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0] tokens=[16384, 16384, 16384, 8098, 8480, 8712, 3101, 4949, 2002, 13452, 15581, 16384]
+Step 5: editor evidence=8/12 parseable responses
+Step 5 d4d1491e0a2a60c8b3cd0124fae1c44a8c2bb20dca12002b5008c798d21c3514: proposal verified=False mean_deltas=[-0.01803637906393205, -0.018933538968307517, -0.011365753284127677]
+Step 5 d4d1491e0a2a60c8b3cd0124fae1c44a8c2bb20dca12002b5008c798d21c3514: refinement verified=False mean_deltas=[-0.01640112293326199, -0.019938843008760736, -0.012012221878855612]
+Step 5 10ca5b6ca553ba525afa73c77d09db8ef7e17a2cdbc9d29bb0f0b5993eac6c0d: proposal verified=False mean_deltas=[-0.03275876907768095, -0.04052457842852559, -0.0596592847905926]
+Step 5 10ca5b6ca553ba525afa73c77d09db8ef7e17a2cdbc9d29bb0f0b5993eac6c0d: refinement verified=False mean_deltas=[-0.040433268288448766, -0.03773202361772334, -0.044486640283385975]
+Step 5 76a0935a544dec2ef028277cbf88d57e16400c5a22f954218a0f3645e6fb518b: proposal verified=False mean_deltas=[-0.012790624265837526, -0.01391711232781132]
+Step 5 76a0935a544dec2ef028277cbf88d57e16400c5a22f954218a0f3645e6fb518b: refinement verified=False mean_deltas=[-0.027564223550100315, -0.026559530616929276]
+Step 5: accepted=False validation=0.7667->0.7667
+Search complete: selected candidate 0; starting frozen-prompt test
+Test initial: 10/300
+Test initial: 20/300
+Test initial: 30/300
+Test initial: 40/300
+Test initial: 50/300
+Test initial: 60/300
+Test initial: 70/300
+Test initial: 80/300
+Test initial: 90/300
+Test initial: 100/300
+Test initial: 110/300
+Test initial: 120/300
+Test initial: 130/300
+Test initial: 140/300
+Test initial: 150/300
+Test initial: 160/300
+Test initial: 170/300
+Test initial: 180/300
+Test initial: 190/300
+Test initial: 200/300
+Test initial: 210/300
+Test initial: 220/300
+Test initial: 230/300
+Test initial: 240/300
+Test initial: 250/300
+Test initial: 260/300
+Test initial: 270/300
+Test initial: 280/300
+Test initial: 290/300
+Test initial: 300/300
+Completed: /home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-full_question_centered-gpu0

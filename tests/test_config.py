@@ -7,14 +7,11 @@ from prompt_policy.cli import run
 from prompt_policy.config import resolve_model, validate_config
 
 
-def test_dry_run_never_creates_output_directory(tmp_path):
+def test_removed_gepa_cannot_silently_run_or_create_output(tmp_path):
     root = Path(__file__).resolve().parents[1]
     destination = tmp_path / "new-run"
-    plan = run(
-        root / "experiments/qwen3_success_likelihood/experiment.toml", dry_run=True, output=destination
-    )
-    assert not plan["executable"]
-    assert "model.name_or_path" in plan["missing"][0]
+    with pytest.raises(ValueError, match="Standalone GEPA framework support was removed"):
+        run(root / "tests/fixtures/base.toml", dry_run=True, output=destination)
     assert not destination.exists()
 
 
@@ -39,3 +36,17 @@ def test_invalid_conditions_rejected(config, section, key, value):
     value_config[section][key] = value
     with pytest.raises(ValueError):
         validate_config(value_config)
+
+
+@pytest.mark.parametrize("section", ["generation", "reflection"])
+@pytest.mark.parametrize("value", [-1, True, 20.0])
+def test_invalid_top_k_is_rejected(config, section, value):
+    config[section]["top_k"] = value
+    with pytest.raises(ValueError, match="top_k"):
+        validate_config(config)
+
+
+def test_removed_gepa_section_is_rejected(config):
+    config["gepa_refinement"] = {"enabled": True}
+    with pytest.raises(ValueError, match="Config requires"):
+        validate_config(config)

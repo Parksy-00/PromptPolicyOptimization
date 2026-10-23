@@ -1,0 +1,33 @@
+Your task is to refine the new instruction by comparing it with the original instruction and using the observed responses and likelihood changes.
+
+Original Instruction:
+Solve the problem and provide the answer in the correct format.
+
+New Instruction:
+Solve the problem carefully and check the arithmetic before concluding.
+
+The following are task input and assistant's responses.
+
+Input:
+1 + 1 = ?
+Gold answer: 2
+
+Successful response 1:
+Adding one to one gives two.
+\boxed{2}
+mean log-prob under original instruction = -0.42
+mean log-prob change = +0.18
+
+Failed response 2:
+I matched a familiar pattern too quickly.
+\boxed{3}
+mean log-prob under original instruction = -0.31
+mean log-prob change = +0.24
+
+Feedback:
+The new instruction increased the likelihood of Successful response 1. This is desirable; preserve this increase.
+The new instruction increased the likelihood of Failed response 2. This is undesirable; revise the instruction to decrease that likelihood.
+
+Refine the new instruction using the observed responses and measured likelihood changes. For failed responses, diagnose what went wrong and write instructions that prevent the same failure.
+For successful responses, identify useful behaviors and write instructions that help reproduce them.
+Infer which semantic component of the change from the original instruction to the new instruction caused the harmful likelihood changes identified in the feedback. Revise the new instruction to reinforce successful responses and suppress failed responses, preserving beneficial changes. Write general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies. Return the complete updated instruction inside exactly one <instruction>...</instruction> block.

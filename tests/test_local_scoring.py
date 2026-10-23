@@ -46,5 +46,9 @@ def test_qwen3_teacher_forcing_matches_full_causal_lm_and_chunks(device):
     assert values == pytest.approx(token_logprobs(model, prefix, response, head_chunk=1), abs=1e-6)
     assert values == pytest.approx(token_logprobs(model, prefix, response), abs=1e-6)
     assert values == token_logprobs(model, prefix, response, head_chunk=2)
+    actual, top1 = token_logprobs(model, prefix, response, head_chunk=2, return_top1=True)
+    expected_top1 = torch.log_softmax(logits[0, len(prefix) - 1 : -1], -1).amax(-1).cpu()
+    torch.testing.assert_close(torch.tensor(top1), expected_top1, atol=1e-6, rtol=1e-6)
+    assert actual == pytest.approx(values, abs=1e-6)
     with pytest.raises(ValueError, match="eval mode"):
         token_logprobs(model.train(), prefix, response)

@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-20T07:17:35.424397+00:00",
+  "reason": "User requested cancellation of duplicate base test and final selected test on GPU0+1",
+  "source_run": "20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1",
+  "initial_test_completed_retained": 203,
+  "selected_test_completed_retained": 0,
+  "terminated_process_group": 2970646,
+  "superseded_controller_pid": 2673957,
+  "servers_preserved": true,
+  "handoff_directory": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/selected-test-handoff-20261020T071735Z"
+}

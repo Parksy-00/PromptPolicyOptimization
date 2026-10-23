@@ -4,6 +4,7 @@ import hashlib
 import json
 from collections import Counter
 from pathlib import Path
+from threading import Lock
 
 
 def digest(value) -> str:
@@ -24,9 +25,10 @@ class Recorder:
     def __init__(self, run_dir: Path):
         self.run_dir = run_dir
         self.cost = Counter()
+        self.lock = Lock()
 
     def append(self, name: str, value: dict):
-        with (self.run_dir / name).open("a", encoding="utf-8") as stream:
+        with self.lock, (self.run_dir / name).open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(value, ensure_ascii=False, allow_nan=False) + "\n")
 
     def write(self, name: str, value: dict):
@@ -36,7 +38,8 @@ class Recorder:
         temporary.replace(path)
 
     def charge(self, kind: str, *, prompt_tokens: int, response_tokens: int, elapsed: float):
-        self.cost[f"{kind}_calls"] += 1
-        self.cost[f"{kind}_prompt_tokens"] += prompt_tokens
-        self.cost[f"{kind}_response_tokens"] += response_tokens
-        self.cost[f"{kind}_seconds"] += elapsed
+        with self.lock:
+            self.cost[f"{kind}_calls"] += 1
+            self.cost[f"{kind}_prompt_tokens"] += prompt_tokens
+            self.cost[f"{kind}_response_tokens"] += response_tokens
+            self.cost[f"{kind}_seconds"] += elapsed

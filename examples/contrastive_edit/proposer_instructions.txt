@@ -1,0 +1,2 @@
+Propose an updated instruction using the observed responses. For failed responses, diagnose what went wrong and write instructions that prevent the same failure.
+For successful responses, identify useful behaviors and write instructions that help reproduce them. Write general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies. Return the complete updated instruction inside exactly one <instruction>...</instruction> block.

@@ -19,6 +19,9 @@ class Generation:
     response_ids: tuple[int, ...]
     finish_reason: str
     thinking_open_in_prefix: bool = False
+    rollout_token_logprobs: tuple[float, ...] | None = None
+    rollout_logprobs_mode: str | None = None
+    rollout_sampling: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -34,6 +37,9 @@ class Trajectory:
     reward: float
     finish_reason: str
     thinking_open_in_prefix: bool = False
+    rollout_token_logprobs: tuple[float, ...] | None = None
+    rollout_logprobs_mode: str | None = None
+    rollout_sampling: dict | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -43,6 +49,8 @@ class Trajectory:
         value = dict(value)
         value["prompt_ids"] = tuple(value["prompt_ids"])
         value["response_ids"] = tuple(value["response_ids"])
+        if value.get("rollout_token_logprobs") is not None:
+            value["rollout_token_logprobs"] = tuple(value["rollout_token_logprobs"])
         return cls(**value)
 
 

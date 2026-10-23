@@ -1,0 +1,7 @@
+{"at": "2026-10-19T16:54:18.083335+00:00", "event": "condition_started", "condition": "full_raw", "gpu": 0, "pid": 2673959}
+{"at": "2026-10-19T16:54:18.133697+00:00", "event": "condition_started", "condition": "response_raw", "gpu": 1, "pid": 2673963}
+{"at": "2026-10-20T00:52:17.912806+00:00", "event": "condition_finished", "condition": "response_raw", "status": "complete", "returncode": 0}
+{"at": "2026-10-20T00:52:17.917118+00:00", "event": "condition_started", "condition": "branch_raw", "gpu": 1, "pid": 2970646}
+{"at": "2026-10-20T03:39:53.635927+00:00", "event": "condition_finished", "condition": "full_raw", "status": "complete", "returncode": 0}
+{"at": "2026-10-20T03:39:53.640000+00:00", "event": "condition_started", "condition": "full_question_centered", "gpu": 0, "pid": 3276367}
+{"at": "2026-10-20T05:36:03.095745+00:00", "event": "condition_finished", "condition": "full_question_centered", "status": "complete", "returncode": 0}

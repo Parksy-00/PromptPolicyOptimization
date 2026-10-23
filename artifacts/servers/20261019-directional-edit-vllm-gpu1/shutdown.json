@@ -1,0 +1,9 @@
+{
+  "requested_at": "2026-10-19T07:15:40.473844+00:00",
+  "pid": 2288387,
+  "reason": "Authorized pilot completed; release owned local GPU1 serving resources.",
+  "confirmed_at": "2026-10-19T07:17:56.323477+00:00",
+  "server_process_absent": true,
+  "engine_process_absent": true,
+  "gpu1_memory_mib_after_shutdown": 1
+}

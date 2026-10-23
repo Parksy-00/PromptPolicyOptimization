@@ -1,0 +1,187 @@
+{
+  "suite_id": "20261019T164843Z-validation-user-only-batch4-four-variants",
+  "root": "/home/parksy1202/workspace/PromptPolicyOptimization",
+  "launch_dir": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants",
+  "report_dir": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/reports/20261019T164843Z-validation-user-only-batch4-four-variants",
+  "base_run_id": "20261019T125813Z-directional-boxed-parseable-16k-one-step-gpu01",
+  "reference_run_id": "20261019T140919Z-directional-fixed-base-batch4-probe-gpu01",
+  "servers": [
+    {
+      "gpu": 0,
+      "pid": 2516868,
+      "manifest": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T164843Z-validation-suite-gpu0/server.json",
+      "directory": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T164843Z-validation-suite-gpu0",
+      "base_url": "http://127.0.0.1:8016/v1"
+    },
+    {
+      "gpu": 1,
+      "pid": 2516869,
+      "manifest": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T164843Z-validation-suite-gpu1/server.json",
+      "directory": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T164843Z-validation-suite-gpu1",
+      "base_url": "http://127.0.0.1:8017/v1"
+    }
+  ],
+  "conditions": [
+    {
+      "name": "full_raw",
+      "gpu": 0,
+      "config": "/home/parksy1202/workspace/PromptPolicyOptimization/experiments/directional_validation_user_only_batch4_full_raw/experiment.toml",
+      "run_id": "20261019T164843Z-directional-validation-user-only-batch4-full_raw-gpu0",
+      "run_dir": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-full_raw-gpu0",
+      "status": "complete",
+      "execution_config": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/full_raw.toml",
+      "config_file_sha256": "94cd482be2a19e80d6bf27d36203855270cda1221b16f033a8ebac7c528d5fe3",
+      "pid": 2673959,
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "prompt_policy",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/full_raw.toml",
+        "--output",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-full_raw-gpu0"
+      ],
+      "log": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/full_raw.log",
+      "started_at": "2026-10-19T16:54:18.083323+00:00",
+      "returncode": 0,
+      "finished_at": "2026-10-20T03:39:50.505296+00:00",
+      "audit": {
+        "status": "passed",
+        "captured_rollouts": 60,
+        "distinct_questions": 20,
+        "iterations": 5,
+        "likelihood_records_verified": 196,
+        "all_validation_and_test_rows": true,
+        "frozen_source_verified": true
+      }
+    },
+    {
+      "name": "response_raw",
+      "gpu": 1,
+      "config": "/home/parksy1202/workspace/PromptPolicyOptimization/experiments/directional_validation_user_only_batch4_response_raw/experiment.toml",
+      "run_id": "20261019T164843Z-directional-validation-user-only-batch4-response_raw-gpu1",
+      "run_dir": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-response_raw-gpu1",
+      "status": "complete",
+      "execution_config": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/response_raw.toml",
+      "config_file_sha256": "20e7c3ca081f27cbd26daa82cd240437e532d15493b9aaf5d49d0e4c945de831",
+      "pid": 2673963,
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "prompt_policy",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/response_raw.toml",
+        "--output",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-response_raw-gpu1"
+      ],
+      "log": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/response_raw.log",
+      "started_at": "2026-10-19T16:54:18.133681+00:00",
+      "returncode": 0,
+      "finished_at": "2026-10-20T00:52:15.306106+00:00",
+      "audit": {
+        "status": "passed",
+        "captured_rollouts": 60,
+        "distinct_questions": 20,
+        "iterations": 5,
+        "likelihood_records_verified": 200,
+        "all_validation_and_test_rows": true,
+        "frozen_source_verified": true
+      }
+    },
+    {
+      "name": "full_question_centered",
+      "gpu": 0,
+      "config": "/home/parksy1202/workspace/PromptPolicyOptimization/experiments/directional_validation_user_only_batch4_full_question_centered/experiment.toml",
+      "run_id": "20261019T164843Z-directional-validation-user-only-batch4-full_question_centered-gpu0",
+      "run_dir": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-full_question_centered-gpu0",
+      "status": "complete",
+      "execution_config": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/full_question_centered.toml",
+      "config_file_sha256": "415b12357766e0edee013403c7421f550f605113a1a1800b38d354e96251a3a9",
+      "pid": 3276367,
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "prompt_policy",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/full_question_centered.toml",
+        "--output",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-full_question_centered-gpu0"
+      ],
+      "log": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/full_question_centered.log",
+      "started_at": "2026-10-20T03:39:53.639988+00:00",
+      "returncode": 0,
+      "finished_at": "2026-10-20T05:36:01.842281+00:00",
+      "audit": {
+        "status": "passed",
+        "captured_rollouts": 60,
+        "distinct_questions": 20,
+        "iterations": 5,
+        "likelihood_records_verified": 188,
+        "all_validation_and_test_rows": true,
+        "frozen_source_verified": true
+      }
+    },
+    {
+      "name": "branch_raw",
+      "gpu": 1,
+      "config": "/home/parksy1202/workspace/PromptPolicyOptimization/experiments/directional_validation_user_only_batch4_branch_raw/experiment.toml",
+      "run_id": "20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1",
+      "run_dir": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1",
+      "status": "running",
+      "execution_config": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/branch_raw.toml",
+      "config_file_sha256": "eb9f8e7a1c8321d48c9f4bc6ea281bd4843b63354577fbb61a85cd333996aaea",
+      "pid": 2970646,
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "prompt_policy",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/configs/branch_raw.toml",
+        "--output",
+        "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1"
+      ],
+      "log": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/branch_raw.log",
+      "started_at": "2026-10-20T00:52:17.917107+00:00"
+    }
+  ],
+  "status": "running",
+  "created_at": "2026-10-19T16:48:43.658107+00:00",
+  "frozen_project": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/project",
+  "source_files_sha256": {
+    "src/prompt_policy/__init__.py": "d61517e69a108d056e37990d4d717712528fb7ded6810c399f10f313cc7d5f2b",
+    "src/prompt_policy/__main__.py": "f9f8b3e06c9f2ce99310983dabcb17da452b2dc4c3b49ac1d08a924172a4f23b",
+    "src/prompt_policy/analysis/__init__.py": "1dc427ed284a2fc6a1a87ee0dded6f98595001538ccf5b7a44a3f4abc0d5a6a3",
+    "src/prompt_policy/analysis/textgrad_endpoints.py": "093683071954ed3a8e43bbcf270fbc5d7d4d90dc50290eb03e413adda2fdd304",
+    "src/prompt_policy/analysis/textgrad_likelihood.py": "30900491a3f3983cffb5af7aae682e71b3608735eb8e4fc36696c00756d1099b",
+    "src/prompt_policy/analysis/textgrad_report.py": "dd0c530c8057b24348201bed167d0f752cdd9312fc46bfa817dc6587b2bff5a9",
+    "src/prompt_policy/artifacts.py": "a8a10b7d6ae9462890b1886189477f45cc13afb07276bc6df4c0d8351e398aea",
+    "src/prompt_policy/backends.py": "0138f50ecd3163f035883fb10dec91f37cbcd66d893fb6e02c842c4c3c354c62",
+    "src/prompt_policy/benchmarks.py": "ce5085179ef0d66d051a94bff0e5222acae4208d48b82c3db9a4289619bf4e62",
+    "src/prompt_policy/cli.py": "d349bc2e46e28bb10272102343884aa4b207839b8402d819b74eb24f15114935",
+    "src/prompt_policy/config.py": "9d46f841e7caa4188f7671e0b4ddcfaec85bf60d875e3eb844ba2013ad6322f9",
+    "src/prompt_policy/edit_optimizer.py": "51bf4bca5aa00dfe227b2902981f5fe704e6c2cba3958e9b303ea538d809f3c3",
+    "src/prompt_policy/edit_prompts.py": "56baa3513cfaf0327dbb4b1b261ef372d14b6f3f47c730d506a77d57f838a70c",
+    "src/prompt_policy/objective.py": "23c3ccd7e9599c3c16506fdf645ac9ab4104c653c0fea25bcf0ba0c120c38552",
+    "src/prompt_policy/optimizer.py": "8a95dbc98ff633470d64f1b24781b0bcd61ed33fbd10ed3d0b2b8a012a994db2",
+    "src/prompt_policy/scoring.py": "907b994e3cc258fc830a991d9047ad61c0173a8faaf17924f0f9567b26d2e005",
+    "src/prompt_policy/textgrad_optimizer.py": "ae3dd0a4344317ca22fc9c0d5991ea33b53156729fefe6b31fce36e6e6c70a3c",
+    "src/prompt_policy/types.py": "89c116b6e4cf217d721ec9dfe279d77f3f6621c847680accf315894aef316c37",
+    "pyproject.toml": "a528cca5c1fc6d6aaa64a963c6af8d00c76e4bc9d4c326db33ad5d1a6a797616",
+    "uv.lock": "fd2b4d72a4390720ed44830c956717c7bee135a0b4cbc03725a500c2788befed"
+  },
+  "verification": {
+    "tests": "247 passed,1 skipped",
+    "ruff": "passed",
+    "dry_run": "all four executable; identical20-question schedule;8 edit attempts/round; complete validation/test300"
+  },
+  "controller_pid": 2673957,
+  "started_at": "2026-10-19T16:54:18.060135+00:00"
+}

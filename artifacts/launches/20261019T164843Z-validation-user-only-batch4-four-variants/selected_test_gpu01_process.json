@@ -1,0 +1,6 @@
+{
+  "pid": 866517,
+  "process_group": 866517,
+  "log": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261019T164843Z-validation-user-only-batch4-four-variants/selected_test_gpu01.log",
+  "execution": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261020T072116Z-branch-selected-test-continuation-gpu01"
+}

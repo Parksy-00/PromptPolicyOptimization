@@ -1,0 +1,14 @@
+source_run = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T164843Z-directional-validation-user-only-batch4-branch_raw-gpu1"
+archive_run = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261020T071046Z-geometry-fixed-trajectory-alternative-token-audit-gpu0"
+variants = ["parent", "proposal", "refinement"]
+
+[policy]
+temperature = 0.6
+top_k = 20
+top_p = 0.95
+
+[numerics]
+# Bounds account for archived FP32 logprob rounding and uncertain filter boundaries.
+# These are uncertainty tolerances, not a probability floor.
+mass_tolerance = 0.00001
+cdf_tolerance = 0.000001

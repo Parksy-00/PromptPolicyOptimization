@@ -51,7 +51,7 @@ def setup(config):
     config["textgrad"] = {"proposals_per_batch": 2}
     config["search"].update(max_iterations=2, train_rollouts=1, validation_rollouts=1)
     root = Path(__file__).parents[1]
-    benchmark = load_benchmark(config["benchmark"], root / "experiments/qwen3_success_likelihood")
+    benchmark = load_benchmark(config["benchmark"], root / "tests/fixtures")
     return replace(
         benchmark,
         train=tuple(
@@ -169,7 +169,7 @@ def test_cli_textgrad_records_upstream_and_freezes_selection_before_test(tmp_pat
     from prompt_policy import backends
     from prompt_policy.cli import run
 
-    config_path = prepare_config(tmp_path)
+    config_path = prepare_config(tmp_path, editor=False)
     text = config_path.read_text().replace(
         'mode = "success_likelihood"', 'mode = "success_likelihood_ascent"'
     )

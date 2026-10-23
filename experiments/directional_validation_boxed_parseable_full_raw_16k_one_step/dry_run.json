@@ -1,0 +1,177 @@
+{
+  "executable": true,
+  "missing": [],
+  "config": {
+    "initial_prompt": "Solve the problem and provide the answer in the correct format.",
+    "benchmark": {
+      "allow_within_split_question_duplicates": true,
+      "name": "DAPOMathBench_seed0_canonical_150_300_300_boxed_v1",
+      "scorer": "boxed_integer_v1",
+      "task_format": "boxed_integer_v1",
+      "train": "../../artifacts/inputs/dapo_seed0_canonical_150_300_300/train.jsonl",
+      "validation": "../../artifacts/inputs/dapo_seed0_canonical_150_300_300/validation.jsonl",
+      "test": "../../artifacts/inputs/dapo_seed0_canonical_150_300_300/test.jsonl"
+    },
+    "model": {
+      "name_or_path": "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218",
+      "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "max_context_tokens": 40960,
+      "head_chunk": 256
+    },
+    "generation": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "max_new_tokens": 16384,
+      "enable_thinking": true
+    },
+    "reflection": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "max_new_tokens": 8192
+    },
+    "search": {
+      "minibatch_size": 1,
+      "train_rollouts": 3,
+      "validation_rollouts": 1,
+      "test_rollouts": 1,
+      "max_iterations": 1,
+      "max_task_rollouts": 3315,
+      "search_seed": 0
+    },
+    "edit_refinement": {
+      "likelihood_scope": "full",
+      "drift_correction": "none",
+      "score_unit": "mean"
+    },
+    "objective": {
+      "mode": "directional_likelihood"
+    },
+    "serving": {
+      "base_url": "http://127.0.0.1:8016/v1",
+      "model": "qwen3-8b-pinned",
+      "max_concurrency": 32,
+      "timeout_seconds": 1800,
+      "server_manifest": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T125813Z-boxed-16k-gpu0/server.json",
+      "replicas": [
+        {
+          "base_url": "http://127.0.0.1:8017/v1",
+          "server_manifest": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T125813Z-boxed-16k-gpu1/server.json"
+        }
+      ]
+    }
+  },
+  "benchmark": {
+    "name": "DAPOMathBench_seed0_canonical_150_300_300_boxed_v1",
+    "scorer": "boxed_integer_v1",
+    "scorer_version": 1,
+    "sources": {
+      "train": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/train.jsonl",
+        "sha256": "6c910549e0ce5f80c73bbd4dcf4137d65653023a2089a3090ef7e1846682d584",
+        "count": 150
+      },
+      "validation": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/validation.jsonl",
+        "sha256": "4733ed175050978cdc538a7c86b3919601bed8fb6edd44946f04c81c731d3e66",
+        "count": 300
+      },
+      "test": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/test.jsonl",
+        "sha256": "a7024c7130a61522c0e908a8bdc0becdbbf2b6268796c68d4b0c4185d76b4641",
+        "count": 300
+      }
+    },
+    "fingerprint": "1e31f654e9afba8bf2f4b171492ef31ae2423c76b2147a0148b8d7dadbfe0c18",
+    "task_format": "boxed_integer_v1",
+    "fixed_output_rule": "Put your final answer at the end of your response in \\boxed{...}, with only a plain integer inside (e.g. \\boxed{42}).",
+    "question_duplicate_policy": "preserve_within_split_only",
+    "within_split_question_duplicates": [
+      {
+        "split": "test",
+        "first_id": "19efa660dbfc2ec91b551cbe4617ac32ad9e90612226c65e3c80c6fb5d8c0d90",
+        "duplicate_id": "307a4648b36eb51b4fdc6635a98264c812ae48f122c56a56f5d21a93fdc4a17d"
+      }
+    ]
+  },
+  "edit_refinement": {
+    "implementation": "minimal propose-measure-refine/v7-verified-base-validation-reuse",
+    "proposer_sha256": "766d56afd162289e7b717361e2af9f424845e8faba42821466bfc5e371491c45",
+    "refiner_sha256": "45a943e19e23b121cd7399aeef3b11312ee1ba8d8628afc2ede5bc1fc26dc279"
+  },
+  "optimizer": "edit_refinement",
+  "objective": "verify each observed success increases and each observed failure decreases; rank by question-balanced signed likelihood gain; require validation nondecrease; single-class pools eligible only without question centering",
+  "final_selection": "last_likelihood_and_validation_verified_prompt",
+  "notes": [
+    "No sampling seeds are sent; search_seed controls search minibatches only.",
+    "Optimizer reserves each complete iteration; missing-evidence batches can use less.",
+    "Built-in JSONL scorers do not claim canonical DAPO/GPQA equivalence.",
+    "Base validation is measured once; distinct likelihood-verified edits get fresh complete validation. Ties with the parent are accepted.",
+    "Validation generations and train generations share max_task_rollouts; final test is separate.",
+    "Validation responses never enter proposer/refiner; repeated adaptive validation is not held-out test evidence.",
+    "Only answer-parseable train trajectories enter editing and likelihood verification; both correct and incorrect answers are retained.",
+    "Editors see only post-thinking text; likelihood masks still apply to each retained original full response ID sequence.",
+    "A minibatch without parseable responses counts as one skipped iteration; no retry or resampling.",
+    "Each retained success must increase and each retained failure decrease; all reward compositions are used.",
+    "The proposer receives task/reward evidence; the refiner additionally receives numerical changes.",
+    "T=1 full-vocabulary sequence likelihood differs from the truncated sampling policy."
+  ],
+  "task_interface": {
+    "task_format": "boxed_integer_v1",
+    "editable_component": "instruction_only",
+    "initial_instruction": "Solve the problem and provide the answer in the correct format.",
+    "fixed_output_rule": "Put your final answer at the end of your response in \\boxed{...}, with only a plain integer inside (e.g. \\boxed{42}).",
+    "initial_task_messages_example": [
+      {
+        "role": "system",
+        "content": "Solve the problem and provide the answer in the correct format."
+      },
+      {
+        "role": "user",
+        "content": "Put your final answer at the end of your response in \\boxed{...}, with only a plain integer inside (e.g. \\boxed{42}).\n\nQuestion:\nA large candle is $119$ centimeters tall. It is designed to burn down more quickly when it is first lit and more slowly as it approaches its bottom. Specifically, the candle takes $10$ seconds to burn down the first centimeter from the top, $20$ seconds to burn down the second centimeter, and $10k$ seconds to burn down the $k$-th centimeter. (The candle burns down each individual centimeter at a fixed rate.)\n\nSuppose it takes $T$ seconds for the candle to burn down completely. Compute the candle's height in centimeters $\\tfrac{T}{2}$ seconds after it is lit."
+      }
+    ],
+    "answer_filter": "last balanced \\boxed{...} outside thinking, containing only [+-]?[0-9]+; integer equality; no fallback"
+  },
+  "train_minibatch_schedule": [
+    [
+      "768ed0a8c94d0bb040170af8e1e65baa20c25546894b2bdd63ad105fcdd093a0"
+    ]
+  ],
+  "likelihood_measurement": {
+    "scope": "full",
+    "drift_correction": "none",
+    "score_unit": "mean",
+    "branch_probability_threshold": null,
+    "empty_mask": "unverifiable; never treat missing response as probability one",
+    "mask_source": "parent, fixed for parent and all candidates"
+  },
+  "optimizer_prompts": {
+    "proposer_system": "Improve the current task instruction using the observed rollouts.\nFor failed rollouts, diagnose what went wrong and write instructions that prevent the same failure.\nFor successful rollouts, identify useful behaviors and write instructions that help reproduce them.\nReturn one complete, general task instruction, not a report for each example.\nWrite general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies.\nDo not hard-code the observed problem's numbers, equations, named objects, or answer into the instruction.\nDo not invent observations or missing success/failure classes. Do not copy questions, answers or solutions.\nDo not include explanations, diagnoses, example/trajectory sections, or final-answer formatting instructions.\nOutput exactly one <instruction>...</instruction> block containing only the replacement instruction.\nWrite nothing outside that block and do not use Markdown fences.\n",
+    "refiner_system": "Inspect the current prompt, candidate edit and measured likelihood changes on fixed trajectories.\nThe desired update is to make successful trajectories more likely and failed trajectories less likely.\nFollow the scoring scope and raw or drift-relative direction criterion declared in the feedback.\nA positive drift-relative change is relative reinforcement; it does not imply an absolute probability increase.\nInfer which semantic component of the edit could have caused an undesirable likelihood shift,\nand propose a revised instruction that reverses that shift. Preserve changes that moved in the desired direction.\nUse the actual trajectory contents and the change from the current prompt to the candidate, not just the numbers.\nReturn one complete, general task instruction, not a report for each example.\nWrite general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies.\nDo not hard-code the observed problem's numbers, equations, named objects, or answer into the instruction.\nDo not invent observations or missing success/failure classes. Do not copy questions, answers or solutions.\nDo not include explanations, diagnoses, example/trajectory sections, or final-answer formatting instructions.\nOutput exactly one <instruction>...</instruction> block containing only the replacement instruction.\nWrite nothing outside that block and do not use Markdown fences.\n"
+  },
+  "optimizer_output_contract": {
+    "tag": "instruction",
+    "extraction": "one nonempty block outside thinking; discard surrounding text",
+    "invalid_output": "record raw output and fail before admission; no fallback or retry"
+  },
+  "pipeline": [
+    "reuse verified matching base validation when search.base_validation_run is set; otherwise generate it",
+    "train minibatch rollouts and task rewards; archive all original responses/IDs",
+    "retain answer-parseable trajectories; show only post-thinking response text; skip empty batches",
+    "diagnose failures and reproduce successes -> one complete instruction proposal",
+    "score the exact fixed parent response IDs under parent and proposal",
+    "one refinement using measured changes -> score the same fixed responses",
+    "fresh validation for each distinct direction-verified improvement",
+    "require validation accuracy >= stored parent validation; select by validation, then train gain; or keep parent",
+    "freeze the last accepted prompt before initial/selected test"
+  ],
+  "edit_limits_per_outer_iteration": {
+    "optimizer_calls": 2,
+    "measured_candidates": 2,
+    "task_rollouts_reserved": 603
+  }
+}

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261020T041205Z-gepa-likelihood-refinement-3x1-gpu0/launch_this_execution.py", line 49, in <module>
+    time.sleep(30)
+  File "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/launches/20261020T041205Z-gepa-likelihood-refinement-3x1-gpu0/launch_this_execution.py", line 38, in interrupt
+    def interrupt(signum,frame):raise KeyboardInterrupt(f'signal {signum}')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt: signal 15

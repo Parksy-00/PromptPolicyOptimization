@@ -118,6 +118,9 @@ def capture(benchmark, backend, recorder, prompt, examples, repeats, label):
                 value,
                 generated.finish_reason,
                 generated.thinking_open_in_prefix,
+                rollout_token_logprobs=generated.rollout_token_logprobs,
+                rollout_logprobs_mode=generated.rollout_logprobs_mode,
+                rollout_sampling=generated.rollout_sampling,
             )
             recorder.append("trajectories.jsonl", {"capture": label, **trajectory.to_dict()})
             group.append(value)

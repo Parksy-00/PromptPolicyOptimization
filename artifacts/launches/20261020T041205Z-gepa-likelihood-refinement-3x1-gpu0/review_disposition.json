@@ -1,0 +1,6 @@
+{
+  "reason": "User requested official GEPA best-practice investigation before continuing implementation/execution. Original queue worker was stopped while waiting, before server or model generation.",
+  "replacement_plan": "experiments/gepa_likelihood_refinement_dapo_full_raw/plan_report.md",
+  "research_review": "docs/gepa-best-practices.md",
+  "replacement_runs_started": false
+}

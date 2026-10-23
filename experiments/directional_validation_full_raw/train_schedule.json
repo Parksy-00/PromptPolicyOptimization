@@ -1,0 +1,47 @@
+[
+  {
+    "iteration": 0,
+    "canonical_ids": [
+      "768ed0a8c94d0bb040170af8e1e65baa20c25546894b2bdd63ad105fcdd093a0"
+    ],
+    "archived_ids": [
+      "dapo-source-11001"
+    ]
+  },
+  {
+    "iteration": 1,
+    "canonical_ids": [
+      "78b0211247a656b9802c0b378c7f1f27969c77096350fa5472230e0f91617e10"
+    ],
+    "archived_ids": [
+      "dapo-source-2907"
+    ]
+  },
+  {
+    "iteration": 2,
+    "canonical_ids": [
+      "cd218cedf3b31317766cea25c7271058b05c5b979f608d649b83bada28192d1e"
+    ],
+    "archived_ids": [
+      "dapo-source-4733"
+    ]
+  },
+  {
+    "iteration": 3,
+    "canonical_ids": [
+      "3c1e3ab4b6c3e83556aab5ffa30b36afbc7620c3fb89c7fb2e045c1b11bf3283"
+    ],
+    "archived_ids": [
+      "dapo-source-222"
+    ]
+  },
+  {
+    "iteration": 4,
+    "canonical_ids": [
+      "fab58ab944ebde596d20616bfdf6a0abca33c0e918f660c8f992fbf3fdd0ccdf"
+    ],
+    "archived_ids": [
+      "dapo-source-13710"
+    ]
+  }
+]

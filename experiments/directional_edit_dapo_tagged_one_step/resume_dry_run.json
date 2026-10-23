@@ -1,0 +1,143 @@
+{
+  "executable": true,
+  "missing": [],
+  "config": {
+    "initial_prompt": "Solve the problem and provide the answer in the correct format.",
+    "benchmark": {
+      "name": "DAPO_seed0_archived_train32_test6_vllm_pilot",
+      "scorer": "answer_tag_integer_v1",
+      "task_format": "answer_tag_integer_v1",
+      "train": "../../artifacts/inputs/dapo_seed0_train32_test6/train.jsonl",
+      "validation": "../../artifacts/inputs/dapo_seed0_train32_test6/validation.jsonl",
+      "test": "../../artifacts/inputs/dapo_seed0_train32_test6/test.jsonl"
+    },
+    "model": {
+      "name_or_path": "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218",
+      "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+      "device": "cuda:0",
+      "dtype": "bfloat16",
+      "max_context_tokens": 40960,
+      "head_chunk": 256
+    },
+    "generation": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "max_new_tokens": 8192,
+      "enable_thinking": true
+    },
+    "reflection": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "max_new_tokens": 8192
+    },
+    "search": {
+      "minibatch_size": 3,
+      "train_rollouts": 1,
+      "test_rollouts": 1,
+      "max_iterations": 1,
+      "max_task_rollouts": 3,
+      "search_seed": 0
+    },
+    "edit_refinement": {},
+    "objective": {
+      "mode": "directional_likelihood"
+    },
+    "serving": {
+      "base_url": "http://127.0.0.1:8017/v1",
+      "model": "qwen3-8b-pinned",
+      "max_concurrency": 3,
+      "timeout_seconds": 1800,
+      "server_manifest": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T074120Z-directional-edit-tagged-one-step-gpu1-resume/server.json"
+    }
+  },
+  "benchmark": {
+    "name": "DAPO_seed0_archived_train32_test6_vllm_pilot",
+    "scorer": "answer_tag_integer_v1",
+    "scorer_version": 1,
+    "sources": {
+      "train": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_train32_test6/train.jsonl",
+        "sha256": "ab5f576408375916776e9c8c0885e6ca0291dbf82bfa7c95c07e3799a4ef6888",
+        "count": 32
+      },
+      "validation": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_train32_test6/validation.jsonl",
+        "sha256": "f00731221f959c29aa494969dbf545d14663653a4cd41f4c5affc977dae1f703",
+        "count": 6
+      },
+      "test": {
+        "path": "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_train32_test6/test.jsonl",
+        "sha256": "8a43267cc93eb6d74c8b3c07befc18c3e3f25413f9f373209fe2fae267512ca4",
+        "count": 6
+      }
+    },
+    "fingerprint": "3852ce2cbbee5d8720d622d7b998a4c46f10b5531b54234534013cdceb4760d0",
+    "task_format": "answer_tag_integer_v1",
+    "fixed_output_rule": "Put only the final plain integer inside exactly one <answer>...</answer> block after your reasoning, e.g. <answer>42</answer>. Do not put Markdown or other text inside the block."
+  },
+  "edit_refinement": {
+    "implementation": "minimal propose-measure-refine/v4-instruction-tags",
+    "proposer_sha256": "a240370a2dd25867199f57fe67c7a021e2b83b9af5fb7532f5c07cf55ea2d55c",
+    "refiner_sha256": "b835f2254fe74f4cabf05585f62c009d559c58f71ddc56be909a638283e506ad"
+  },
+  "optimizer": "edit_refinement",
+  "objective": "verify each observed success increases and each observed failure decreases; rank by question-balanced signed likelihood gain; single-class pools are eligible",
+  "final_selection": "last_verified_prompt",
+  "notes": [
+    "No sampling seeds are sent; search_seed controls search minibatches only.",
+    "Optimizer reserves each complete iteration; missing-evidence batches can use less.",
+    "Built-in JSONL scorers do not claim canonical DAPO/GPQA equivalence.",
+    "No validation filtering/selection; validation_accuracy is null (not measured).",
+    "Each success must increase and each failure decrease; all reward compositions are used.",
+    "The proposer receives task/reward evidence; the refiner additionally receives numerical changes.",
+    "T=1 full-vocabulary sequence likelihood differs from the truncated sampling policy."
+  ],
+  "task_interface": {
+    "task_format": "answer_tag_integer_v1",
+    "editable_component": "instruction_only",
+    "initial_instruction": "Solve the problem and provide the answer in the correct format.",
+    "fixed_output_rule": "Put only the final plain integer inside exactly one <answer>...</answer> block after your reasoning, e.g. <answer>42</answer>. Do not put Markdown or other text inside the block.",
+    "initial_task_messages_example": [
+      {
+        "role": "system",
+        "content": "Solve the problem and provide the answer in the correct format.\n\nPut only the final plain integer inside exactly one <answer>...</answer> block after your reasoning, e.g. <answer>42</answer>. Do not put Markdown or other text inside the block."
+      },
+      {
+        "role": "user",
+        "content": "A large candle is $119$ centimeters tall. It is designed to burn down more quickly when it is first lit and more slowly as it approaches its bottom. Specifically, the candle takes $10$ seconds to burn down the first centimeter from the top, $20$ seconds to burn down the second centimeter, and $10k$ seconds to burn down the $k$-th centimeter. (The candle burns down each individual centimeter at a fixed rate.)\n\nSuppose it takes $T$ seconds for the candle to burn down completely. Compute the candle's height in centimeters $\\tfrac{T}{2}$ seconds after it is lit."
+      }
+    ],
+    "answer_filter": "exactly one <answer>[+-]?[0-9]+</answer> block outside thinking; integer equality"
+  },
+  "train_minibatch_schedule": [
+    [
+      "dapo-source-8428",
+      "dapo-source-4998",
+      "dapo-source-1187"
+    ]
+  ],
+  "optimizer_prompts": {
+    "proposer_system": "Improve the current task instruction using the observed rollouts.\nFor failed rollouts, diagnose what went wrong and write instructions that prevent the same failure.\nFor successful rollouts, identify useful behaviors and write instructions that help reproduce them.\nUse whichever outcomes are available and generalize across them.\nDiagnose and plan internally. Return one complete, general task instruction, not a report for each example.\nDo not invent observations or missing success/failure classes. Do not copy questions, answers or solutions.\nDo not include explanations, diagnoses, example/trajectory sections, or final-answer formatting instructions.\nThe fixed task output rule is handled separately and must remain unchanged.\nOutput exactly one <instruction>...</instruction> block containing only the replacement instruction.\nWrite nothing outside that block and do not use Markdown fences.\n",
+    "refiner_system": "Inspect the current prompt, candidate edit and measured likelihood changes on fixed trajectories.\nThe desired update is to make successful trajectories more likely and failed trajectories less likely.\nInfer which semantic component of the edit could have caused an undesirable likelihood shift,\nand propose a revised instruction that reverses that shift. Preserve changes that moved in the desired direction.\nUse the actual trajectory contents and the change from the current prompt to the candidate, not just the numbers.\nUse whichever outcomes are available and generalize across them.\nDiagnose and plan internally. Return one complete, general task instruction, not a report for each example.\nDo not invent observations or missing success/failure classes. Do not copy questions, answers or solutions.\nDo not include explanations, diagnoses, example/trajectory sections, or final-answer formatting instructions.\nThe fixed task output rule is handled separately and must remain unchanged.\nOutput exactly one <instruction>...</instruction> block containing only the replacement instruction.\nWrite nothing outside that block and do not use Markdown fences.\n"
+  },
+  "optimizer_output_contract": {
+    "tag": "instruction",
+    "extraction": "one nonempty block outside thinking; discard surrounding text",
+    "invalid_output": "record raw output and fail before admission; no fallback or retry"
+  },
+  "pipeline": [
+    "train minibatch rollouts and task rewards",
+    "diagnose failures and reproduce successes -> one complete instruction proposal",
+    "score the exact fixed parent response IDs under parent and proposal",
+    "one refinement using measured changes -> score the same fixed responses",
+    "apply the better direction-verified improvement, or keep parent",
+    "freeze the last accepted prompt before initial/selected test"
+  ],
+  "edit_limits_per_outer_iteration": {
+    "optimizer_calls": 2,
+    "measured_candidates": 2,
+    "task_rollouts_reserved": 3
+  }
+}

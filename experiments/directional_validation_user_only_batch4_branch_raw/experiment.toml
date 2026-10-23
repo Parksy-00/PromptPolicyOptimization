@@ -1,0 +1,61 @@
+# User-approved validation-gated optimization:5 rounds,4 questions x3 rollouts; full-scale held-out evaluation.
+initial_prompt = "Solve the problem and provide the answer in the correct format."
+
+[benchmark]
+allow_within_split_question_duplicates = true
+name = "DAPOMathBench_seed0_canonical_150_300_300_boxed_v1"
+scorer = "boxed_integer_v1"
+task_format = "boxed_integer_v1"
+train = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/train.jsonl"
+validation = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/validation.jsonl"
+test = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/inputs/dapo_seed0_canonical_150_300_300/test.jsonl"
+
+[model]
+name_or_path = "/home/parksy1202/.cache/huggingface/hub/models--Qwen--Qwen3-8B/snapshots/b968826d9c46dd6066d109eabc6255188de91218"
+revision = "b968826d9c46dd6066d109eabc6255188de91218"
+device = "cuda:0"
+dtype = "bfloat16"
+max_context_tokens = 40960
+head_chunk = 256
+
+[generation]
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_new_tokens = 16384
+enable_thinking = true
+
+[reflection]
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_new_tokens = 8192
+
+[search]
+minibatch_size = 4
+train_rollouts = 3
+validation_rollouts = 1
+test_rollouts = 1
+max_iterations = 5
+max_task_rollouts = 12060
+base_validation_run = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T125813Z-directional-boxed-parseable-16k-one-step-gpu01"
+search_seed = 0
+
+# One proposal/refinement per question; admit only after full validation, with ties allowed.
+[edit_refinement]
+mode = "validation_gated_per_example"
+likelihood_scope = "branch"
+drift_correction = "none"
+score_unit = "mean"
+branch_probability_threshold = 0.95
+
+[objective]
+mode = "directional_likelihood"
+
+# Transport settings; same frozen server performs generation and fixed-ID scoring.
+[serving]
+base_url = "http://127.0.0.1:8017/v1"
+model = "qwen3-8b-pinned"
+max_concurrency = 16
+timeout_seconds = 1800
+server_manifest = "/home/parksy1202/workspace/PromptPolicyOptimization/artifacts/servers/20261019T164843Z-validation-suite-gpu1/server.json"

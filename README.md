@@ -1,125 +1,18 @@
 # PromptPolicyOptimization
 
-Independent prompt search that verifies whether a proposed instruction increases the likelihood
-of **the same successful trajectories sampled from its parent**. Model weights remain frozen.
-This repository has its own Git history, environment, data interface and artifacts; it does not
-import `common`, `mopcd`, `gepa_artifact`, or another workspace project.
-
-## Setup and verification
+Fixed-trajectory likelihood editing, TextGrad optimization and archived likelihood analyses.
+Model weights remain frozen. GEPA uses **PromptConsolidation's existing artifact implementation**
+at `src/apo/gepa/gepa_artifact/`, through its native runner and separate environment.
+The standalone framework GEPA optimizer and recipes were removed; historical artifacts and
+source snapshots are preserved. `vendor/gepa/` remains only for historical provenance.
 
 ```bash
 uv sync --frozen --extra dev --extra local
 uv run --no-sync pytest
 uv run --no-sync ruff check src tests
-uv run --no-sync prompt-policy experiments/qwen3_success_likelihood/experiment.toml --dry-run
 ```
 
-The dry-run validates settings, split identities and the vendored GEPA source. It neither loads
-a model nor generates responses. The example deliberately leaves the model unspecified and uses
-tiny toy data. Fill `model.name_or_path` with a local HF checkpoint directory. For a remote model,
-also set `model.revision` to an immutable 40-character commit. Remote weights are downloaded only
-when running the experiment. Local weights/tokenizer/config files are hashed for provenance.
-
-Set the three benchmark paths to your own explicitly split JSONL data, with one record per line:
-
-```json
-{"id": "train-0001", "question": "What is 2 + 3?", "answer": "5"}
-```
-
-All values are strings. IDs and normalized question text must be unique across all splits.
-Data and relative model paths are resolved from the TOML's directory. The built-in scorer requires
-a final `### answer`, `Answer: answer`, or `\boxed{answer}`. `numeric` compares exact rational
-numbers; `exact_match` compares strings after trimming outside whitespace. These are explicit
-project scorers, **not claims of equivalence to canonical DAPO/GPQA evaluation**. Implement a new
-benchmark's canonical scorer in `benchmarks.py` and test it before interpreting research results.
-
-Run after reviewing the dry-run and replacing the toy data:
-
-```bash
-uv run --no-sync prompt-policy experiments/qwen3_success_likelihood/experiment.toml
-```
-
-Each invocation creates a new `artifacts/runs/<UTC timestamp>-<unique id>/`. `--output` accepts an
-explicit new directory and refuses existing directories. The first version does not resume runs.
-No real experiment is started by setup, tests or dry-run.
-
-## Method
-
-1. GEPA selects a parent from its accuracy Pareto frontier and a train minibatch.
-2. Generate `train_rollouts` independent responses per question and verify task reward.
-3. GEPA reflects on both successes and failures to propose a new instruction.
-4. Freeze the parent's successful response token IDs. Teacher-force those same IDs under parent
-   and child requests, at scoring temperature **1**, over the full vocabulary.
-5. Generate new child rollouts on the same questions to estimate task accuracy.
-6. Accept when `delta_accuracy + weight * success_gain > tolerance`, provided the observed
-   accuracy drop is within `max_accuracy_drop`. Identical instructions are rejected.
-7. Evaluate accepted candidates on validation; GEPA's global scores/Pareto frontier and final
-   selection use **accuracy only**. Freeze selection before evaluating the initial and selected
-   prompts on test. If selection is the initial prompt, reuse its test evaluation explicitly.
-
-`success_gain` averages token-mean logprob changes inside each successful trajectory, then
-trajectories inside each eligible question, then eligible questions. A question with many successes
-does not outweigh one with a single success. An empty successful pool contributes zero, allowing
-accuracy improvement to drive exploration. Sum logprob change, increase fraction, failure gain and
-coverage are also recorded. Failure likelihood is diagnostic only in this version.
-
-The scored response includes **actual sampled EOS tokens**. No EOS or other token is appended.
-Display text excludes terminal EOS and preserves thinking delimiters. Parent re-rendering must
-match the captured request token IDs. Context overflow is an error rather than silent truncation.
-The scorer uses serial causal hidden states and chunked FP32 full-vocabulary log-softmax.
-
-Generation temperature/top-p are independent of T=1 scoring: this is a length-normalized,
-success-only search surrogate, not an unbiased policy-gradient estimator or a PPO update.
-`search_seed` governs GEPA selection/shuffling. No request-level sampling seed or global training
-seed is applied during real inference. Test data never enters reflection or candidate acceptance.
-
-Reflection uses the same frozen local model, serially, to avoid an API credential dependency or a
-second resident model. Qwen thinking is enabled by the example; raise reflection's token limit if
-it truncates. Truncated reflection causes a visible failed run rather than accepting partial text.
-
-## Comparisons and budget
-
-Make standalone TOML copies; no experiment inheritance or hidden scientific defaults. Useful controls:
-
-| Condition | `mode` | `weight` | `likelihood_feedback` | `measure_likelihood` |
-|---|---|---:|---|---|
-| Accuracy, success examples | `accuracy` | 0 | false | true |
-| Accuracy, likelihood feedback | `accuracy` | 0 | true | true |
-| Success-likelihood objective | `success_likelihood` | explicit positive value | true | true |
-
-Keeping measurements enabled in controls makes teacher-forcing overhead visible. This project's
-accuracy control uses the same success-aware adapter and disables perfect-score skipping, so it
-is not a byte-for-byte reproduction of the paper's original GEPA baseline.
-
-`weight=1` is an illustrative setting, not a calibrated recommendation. Choose it on validation
-without looking at test, and report sensitivity. The minibatch accuracy guard is an observation,
-not a guarantee of nondecreasing true accuracy. Correct final answers do not verify every reasoning
-step, and success likelihood can reward style affinity; measure held-out accuracy and failure gain.
-
-`max_task_rollouts` counts **actual individual task generations**, including validation repeats,
-and excludes reflection and the final test. Limits are checked between complete GEPA iterations;
-the last iteration can exceed the rollout threshold. Report observed counts, generated/prefill
-tokens, teacher-forced tokens, reflection calls and elapsed time. The pinned GEPA's internal
-metric-call counter counts validation question slots; it is retained separately and is not the
-project's budget authority. There is no new scheduler, service or database.
-
-## Run records
-
-- `config.json`, `manifest.json`: resolved conditions, source/model/data hashes, environment,
-  pinned GEPA revision, completion/failure status, time and cost.
-- `trajectories.jsonl`: actual task responses, rewards, split, prompt, original request/response IDs.
-- `likelihood.jsonl`: token logprobs, sum/mean, cache keys and cache hits for fixed responses.
-- `decisions.jsonl`: parent and child instructions, frozen success pool, gains and accept/reject reason.
-- `reflection.jsonl`: actual reflection requests and responses including token IDs.
-- `gepa/`: GEPA's own native state and lineage, unchanged format.
-- `candidates.json`, `selection.json`: candidate pool and validation-only selection before test.
-- `test.jsonl`, `result.json`: initial/selected held-out responses, repeated accuracy and costs.
-
-Research outputs are ignored by Git. Source is kept separately from input/output artifacts.
-The repository does not upload, delete or mirror scientific artifacts automatically.
-
-See [code map](docs/codemap.md), [experimental design](docs/design.md) and
-[third-party provenance](THIRD_PARTY_NOTICES.md).
+See [code map](docs/codemap.md) for the active editing and analysis extension points.
 
 ## Archived TextGrad analysis
 
@@ -127,7 +20,7 @@ The independent [TextGrad likelihood audit](docs/textgrad-likelihood.md) scores 
 train and full optimization-validation responses under their actual parent and proposed prompts.
 It includes accepted and rejected proposals, original validation decisions, a separate repeat8
 validation comparison, per-token traces and independent verification. It performs no generation
-and does not change the GEPA search implementation described above.
+and does not perform optimization.
 
 ## Online TextGrad
 
@@ -135,4 +28,45 @@ The existing CLI also supports official TextGrad with numerical fixed-parent suc
 feedback and a verified positive-gain admission filter. See the [method](docs/textgrad-online.md)
 and the [DAPO pilot plan](experiments/textgrad_dapo_likelihood_pilot/plan_report.md).
 Install the `textgrad` extra alongside the local/dev extras. This is a separate optimizer path;
-the GEPA objective and native state machinery described above retain their existing behavior.
+GEPA runs use the separate artifact implementation described above.
+
+
+## Likelihood editing with validation
+
+Train rollout -> propose -> fixed-response likelihood verification -> refine -> reverify.
+Base validation is evaluated before training; each distinct verified edit gets complete validation.
+Require nondecreasing validation accuracy, select by validation then train likelihood gain, or keep
+parent. Default5 iterations; freeze the last accepted instruction before final test.
+
+Optional scoring scopes are full trajectory, visible response only, and fixed parent branch positions;
+same-question repeated rollouts allow mean-drift correction. Raw likelihood values are always retained.
+See [pipeline](docs/contrastive-edit-refinement.md), [code map](docs/codemap.md), and the
+[300-question validation comparison plan](experiments/directional_validation_full_raw/plan_report.md).
+Local vLLM replicas distribute generation across GPU0 andGPU1 through the existing CLI.
+
+```bash
+uv run --no-sync prompt-policy experiments/directional_validation_full_raw/experiment.toml --dry-run
+```
+
+
+
+### Store generation-time token probabilities
+
+For vLLM rollout sampling probabilities (after temperature, top-k and top-p), start the
+server with `--logprobs-mode processed_logprobs`, retain the exact startup command in
+its server manifest, and add to the experiment's existing `[serving]` section:
+
+```toml
+rollout_logprobs = "processed_logprobs"
+```
+
+Rollout records contain `rollout_token_logprobs`, aligned one-to-one with the original
+`response_ids` including EOS, plus `rollout_logprobs_mode` and `rollout_sampling`. Their
+sum is the generation-time sequence logprob (for length-stopped responses, the generated
+prefix only). `raw_logprobs` is available for pre-filter model probabilities and must not
+be called the sampling policy likelihood. The server mode must match; otherwise startup
+fails. Omitting the option preserves the existing no-capture behavior. This adds no
+teacher-forcing request and does not recover probabilities absent from old rollouts.
+
+Capturing the actual parent probability does not guarantee candidate-prompt likelihood
+will be nonzero: changed top-k/top-p support can still exclude a fixed original token.

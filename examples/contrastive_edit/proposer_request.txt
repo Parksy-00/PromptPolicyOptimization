@@ -1,0 +1,21 @@
+Your task is to write a new instruction for the assistant.
+
+Current Instruction:
+Solve the problem and provide the answer in the correct format.
+
+The following are task input and assistant's responses.
+
+Input:
+1 + 1 = ?
+Gold answer: 2
+
+Successful response 1:
+Adding one to one gives two.
+\boxed{2}
+
+Failed response 2:
+I matched a familiar pattern too quickly.
+\boxed{3}
+
+Propose an updated instruction using the observed responses. For failed responses, diagnose what went wrong and write instructions that prevent the same failure.
+For successful responses, identify useful behaviors and write instructions that help reproduce them. Write general lessons that also apply to other similar problems, expressed as reusable reasoning or verification strategies. Return the complete updated instruction inside exactly one <instruction>...</instruction> block.

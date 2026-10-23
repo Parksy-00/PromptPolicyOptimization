@@ -1,0 +1,7 @@
+{
+  "requested_at": "2026-10-19T07:48:55.452966+00:00",
+  "pid": 216349,
+  "reason": "Exactly one optimizer step completed; release owned GPU1.",
+  "confirmed_at": "2026-10-19T07:50:07.323786+00:00",
+  "api_process_absent": true
+}

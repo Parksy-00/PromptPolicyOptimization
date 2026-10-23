@@ -1,0 +1,62 @@
+Step 0: rollout start (3 questions)
+Step 0: rollout rewards=[0.0, 0.0, 0.0] tokens=[5751, 5740, 8192]
+Step 0: proposal verified=True mean_deltas=[-0.026016, -0.050918, -0.032512]
+Step 0: refinement verified=True mean_deltas=[-0.003652, -0.004241, -0.002927]
+Step 0: proposal=+236.076458 refinement=+23.109176 accepted=True
+Step 1: rollout start (3 questions)
+Step 1: rollout rewards=[1.0, 1.0, 0.0] tokens=[6507, 3534, 3976]
+Step 1: proposal verified=False mean_deltas=[-0.00089, -0.004367, -0.02125]
+Step 1: refinement verified=False mean_deltas=[-0.000389, -0.003942, -0.023341]
+Step 1: proposal=+21.087996 refinement=+25.448636 accepted=False
+Step 2: rollout start (3 questions)
+Step 2: rollout rewards=[0.0, 0.0, 1.0] tokens=[5153, 8192, 5347]
+Step 2: proposal verified=False mean_deltas=[-0.01129, -0.004633, -0.00369]
+Step 2: refinement verified=False mean_deltas=[-0.014359, -0.004793, -0.004201]
+Step 2: proposal=+25.466760 refinement=+30.266312 accepted=False
+Step 3: rollout start (3 questions)
+Step 3: rollout rewards=[1.0, 0.0, 0.0] tokens=[3309, 7786, 8192]
+Step 3: proposal verified=False mean_deltas=[-0.015808, 0.002724, -0.002226]
+Step 3: refinement verified=False mean_deltas=[-0.011336, -0.000805, 0.000482]
+Step 3: proposal=-18.425965 refinement=-11.730860 accepted=False
+Step 4: rollout start (3 questions)
+Step 4: rollout rewards=[0.0, 0.0, 0.0] tokens=[8192, 8192, 8192]
+Step 4: proposal verified=True mean_deltas=[-0.004836, -0.007608, -0.0251]
+Step 4: refinement verified=True mean_deltas=[-0.000569, -0.003022, -0.013287]
+Step 4: proposal=+102.519811 refinement=+46.087935 accepted=True
+Step 5: rollout start (3 questions)
+Step 5: rollout rewards=[0.0, 0.0, 0.0] tokens=[6842, 8192, 8192]
+Step 5: proposal verified=False mean_deltas=[0.0, 0.0, 0.0]
+Step 5: refinement verified=False mean_deltas=[0.00099, 0.001121, -0.000608]
+Step 5: proposal=+0.000000 refinement=-3.657265 accepted=False
+Step 6: rollout start (3 questions)
+Step 6: rollout rewards=[0.0, 0.0, 0.0] tokens=[8192, 4205, 8134]
+Step 6: proposal verified=True mean_deltas=[-0.003972, -0.006856, -0.027648]
+Step 6: refinement verified=True mean_deltas=[-0.005186, -0.010087, -0.027841]
+Step 6: proposal=+95.418895 refinement=+103.784923 accepted=True
+Step 7: rollout start (3 questions)
+Step 7: rollout rewards=[0.0, 0.0, 0.0] tokens=[6865, 5253, 8192]
+Step 7: proposal verified=False mean_deltas=[4.6e-05, 0.000273, -0.000516]
+Step 7: refinement verified=True mean_deltas=[-0.000884, -0.004464, -0.012541]
+Step 7: proposal=+0.827613 refinement=+44.085047 accepted=True
+Step 8: rollout start (3 questions)
+Step 8: rollout rewards=[0.0, 0.0, 0.0] tokens=[8192, 2881, 8192]
+Step 8: proposal verified=True mean_deltas=[-0.001797, -0.028388, -0.001944]
+Step 8: refinement verified=True mean_deltas=[-0.00414, -0.035294, -0.00453]
+Step 8: proposal=+37.477201 refinement=+57.570321 accepted=True
+Step 9: rollout start (3 questions)
+Step 9: rollout rewards=[0.0, 0.0, 0.0] tokens=[5089, 8192, 8118]
+Step 9: proposal verified=True mean_deltas=[-0.004698, -0.014933, -0.001652]
+Step 9: refinement verified=True mean_deltas=[-0.005958, -0.017117, -0.0024]
+Step 9: proposal=+53.216229 refinement=+63.342631 accepted=True
+Step 10: rollout start (2 questions)
+Step 10: rollout rewards=[0.0, 0.0] tokens=[8192, 8192]
+Step 10: proposal verified=False mean_deltas=[-0.011289, 0.001564]
+Step 10: refinement verified=True mean_deltas=[-0.011507, -0.000959]
+Step 10: proposal=+39.832021 refinement=+51.062681 accepted=True
+Step 11: rollout start (3 questions)
+Step 11: rollout rewards=[0.0, 0.0, 0.0] tokens=[8192, 7151, 8192]
+Step 11: proposal verified=False mean_deltas=[4.3e-05, -4.7e-05, -0.000299]
+Step 11: refinement verified=True mean_deltas=[-0.000533, -0.001471, -0.005363]
+Step 11: proposal=+0.810917 refinement=+19.605872 accepted=True
+Search complete: 8 accepted updates; starting frozen-prompt test
+Completed: /home/parksy1202/workspace/PromptPolicyOptimization/artifacts/runs/20261019T063416Z-directional-edit-dapo-vllm-b3-gpu1
